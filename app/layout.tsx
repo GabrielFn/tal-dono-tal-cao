@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: "Tal Dono, Tal Pet — o quanto você se parece com seu pet?",
   description:
-    "Mande uma selfie e uma foto do seu cachorro, gato ou outro pet e a IA diz quantos % vocês são parecidos. Grátis, rápido e as fotos não ficam salvas.",
+    "Mande uma selfie e uma foto do seu cachorro, gato ou outro pet e a IA diz quantos % vocês são parecidos. Grátis, rápido e sem guardar suas fotos.",
   openGraph: {
     title: "O quanto você se parece com seu pet? 🐶🐱",
     description: "A IA compara você e seu pet e dá uma nota de 0 a 100%. Faça o teste grátis!",

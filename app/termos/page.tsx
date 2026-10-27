@@ -32,6 +32,7 @@ export default function Termos() {
         <h2>3. O que você pode enviar</h2>
         <ul>
           <li>Fotos suas, ou de pessoas que autorizaram o uso.</li>
+          <li>Para usar o site, você precisa ter 18 anos ou autorização do seu responsável.</li>
           <li>Fotos de crianças apenas com autorização do responsável.</li>
           <li>Nada de conteúdo ofensivo, violento, sexual ou ilegal.</li>
         </ul>

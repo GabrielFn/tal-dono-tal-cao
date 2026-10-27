@@ -81,8 +81,9 @@ export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar 
       </button>
 
       <p className="letra-miuda">
-        Grátis. As fotos não são salvas: são analisadas e descartadas na hora. Ao continuar, você concorda com
-        os <Link href="/termos">termos</Link> e a <Link href="/privacidade">política de privacidade</Link>.
+        Grátis. Não guardamos suas fotos: elas servem só para gerar o resultado. Ao continuar, você declara
+        ter 18 anos ou autorização do responsável e concorda com os <Link href="/termos">termos</Link> e a{" "}
+        <Link href="/privacidade">política de privacidade</Link>.
       </p>
     </section>
   );
