@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { configPublica } from "@/lib/config/publico";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://taldonotalcao.com.br";
+const SITE = configPublica.siteUrl;
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -26,31 +26,56 @@ Abra http://localhost:3000. Sem `ANTHROPIC_API_KEY`, o app roda em **modo demo**
    ```
 2. Em https://vercel.com, clique em **Add New → Project** e importe o repositório. A Vercel detecta o Next.js sozinha.
 3. Em **Settings → Environment Variables**, cadastre:
-   | Variável | Valor |
-   |---|---|
-   | `ANTHROPIC_API_KEY` | sua chave de https://console.anthropic.com |
-   | `ANTHROPIC_MODEL` | `claude-haiku-5-5` |
-   | `NEXT_PUBLIC_SITE_URL` | o endereço final, ex.: `https://taldonotalcao.com.br` |
-   | `NEXT_PUBLIC_CONTATO_EMAIL` | seu e-mail de contato |
-   | `LIMITE_DIARIO_POR_IP` | `5` |
-   | `LIMITE_DIARIO_GLOBAL` | `500` |
-   | `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` | veja o passo 4 |
-4. **Limite de uso (recomendado):** crie um banco Redis grátis em https://upstash.com (Redis → Create → copie *REST URL* e *REST TOKEN*). Sem isso o limite funciona, mas cada servidor da Vercel conta separado.
+   | Variável                                              | Valor                                                 |
+   | ----------------------------------------------------- | ----------------------------------------------------- |
+   | `ANTHROPIC_API_KEY`                                   | sua chave de https://console.anthropic.com            |
+   | `ANTHROPIC_MODEL`                                     | `claude-haiku-5-5`                                    |
+   | `NEXT_PUBLIC_SITE_URL`                                | o endereço final, ex.: `https://taldonotalcao.com.br` |
+   | `NEXT_PUBLIC_CONTATO_EMAIL`                           | seu e-mail de contato                                 |
+   | `LIMITE_DIARIO_POR_IP`                                | `5`                                                   |
+   | `LIMITE_DIARIO_GLOBAL`                                | `500`                                                 |
+   | `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` | veja o passo 4                                        |
+4. **Limite de uso (recomendado):** crie um banco Redis grátis em https://upstash.com (Redis → Create → copie _REST URL_ e _REST TOKEN_). Sem isso o limite funciona, mas cada servidor da Vercel conta separado.
 5. Clique em **Deploy**. Pronto.
 6. **Domínio:** em **Settings → Domains**, adicione seu domínio (ex.: comprado no Registro.br) e siga as instruções de DNS.
-7. **Na Anthropic:** em *Billing*, coloque créditos e defina um **limite de gasto mensal**, para nunca ter surpresa.
+7. **Na Anthropic:** em _Billing_, coloque créditos e defina um **limite de gasto mensal**, para nunca ter surpresa.
 
 ## Onde mexer
 
-| O que | Arquivo |
-|---|---|
-| Tom do humor, regras e categorias da IA | `lib/prompt.ts` |
-| Visual do card compartilhado | `lib/card.ts` |
-| Tela principal e resultado | `components/App.tsx` |
-| Cores e estilo | `app/globals.css` |
-| Limite de uso | `lib/limite.ts` + variáveis de ambiente |
-| Textos legais | `app/privacidade/page.tsx`, `app/termos/page.tsx` |
-| Resultados do modo demo | `lib/demo.ts` |
+| O que                                   | Arquivo                                             |
+| --------------------------------------- | --------------------------------------------------- |
+| Tom do humor, regras e categorias da IA | `lib/analise/prompt.ts`                             |
+| Visual do card compartilhado            | `lib/cliente/card.ts` (posições no objeto `LAYOUT`) |
+| Tela inicial / tela de resultado        | `components/TelaInicio.tsx`, `TelaResultado.tsx`    |
+| Cores e estilo                          | `app/globals.css`                                   |
+| Limites e variáveis de ambiente         | `lib/config/servidor.ts`, `lib/config/publico.ts`   |
+| Textos legais                           | `app/privacidade/page.tsx`, `app/termos/page.tsx`   |
+| Resultados do modo demo                 | `lib/analise/demo.ts`                               |
+
+## Arquitetura
+
+```
+app/api/analisar/route.ts   Adaptador HTTP (fino): lê o corpo, monta dependências, devolve JSON
+lib/analise/servico.ts      Caso de uso: valida → reserva cota → chama IA → devolve cota se falhar
+lib/analise/                Strategy AnalisadorDeFotos: AnalisadorAnthropic | AnalisadorDemo (+ factory)
+lib/analise/normalizar.ts   Camada anticorrupção: resposta da IA → Resultado confiável
+lib/limite/                 LimitadorDeUso + contadores (Memória | Upstash, com Decorator de fallback)
+lib/config/                 Variáveis de ambiente lidas e validadas num só lugar
+lib/cliente/                Código do navegador: reducer da tela, cliente HTTP, card, compartilhar
+hooks/                      useAnalise (estado + ações) e useCard (gera e libera o card)
+components/                 Componentes de apresentação
+tests/                      Testes unitários (Vitest)
+```
+
+Regras de dependência: `components → hooks → lib/cliente`; `route → lib/analise/servico → interfaces`. O caso de uso não conhece Next.js nem a Anthropic, só as interfaces, por isso é testado com dublês.
+
+## Qualidade
+
+```bash
+npm run check    # typecheck + ESLint + Prettier + testes (rode antes de cada commit)
+npm test         # só os testes
+npm run format   # formata o código
+```
 
 ## Proteções já incluídas
 

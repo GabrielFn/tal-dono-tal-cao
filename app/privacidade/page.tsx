@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Rodape from "@/components/Rodape";
+import { configPublica } from "@/lib/config/publico";
 
 export const metadata: Metadata = { title: "Política de Privacidade — Tal Dono, Tal Cão" };
 
-const EMAIL = process.env.NEXT_PUBLIC_CONTATO_EMAIL || "contato@taldonotalcao.com.br";
+const EMAIL = configPublica.contatoEmail;
 
 export default function Privacidade() {
   return (
@@ -18,8 +19,8 @@ export default function Privacidade() {
 
         <h2>Resumo rápido</h2>
         <p>
-          Suas fotos são usadas só para gerar o resultado e são descartadas logo em seguida. Não criamos conta,
-          não pedimos nome, e-mail ou telefone, e não vendemos dados.
+          Suas fotos são usadas só para gerar o resultado e são descartadas logo em seguida. Não criamos
+          conta, não pedimos nome, e-mail ou telefone, e não vendemos dados.
         </p>
 
         <h2>Quais dados tratamos</h2>
@@ -49,9 +50,9 @@ export default function Privacidade() {
         <h2>Com quem compartilhamos</h2>
         <p>
           Para fazer a análise, as fotos são enviadas a um provedor de inteligência artificial (Anthropic, nos
-          Estados Unidos), que as processa e devolve o resultado, conforme os termos comerciais desse provedor.
-          O site é hospedado na Vercel. Isso envolve transferência internacional de dados, feita apenas na
-          medida necessária para prestar o serviço que você pediu.
+          Estados Unidos), que as processa e devolve o resultado, conforme os termos comerciais desse
+          provedor. O site é hospedado na Vercel. Isso envolve transferência internacional de dados, feita
+          apenas na medida necessária para prestar o serviço que você pediu.
         </p>
 
         <h2>O card gerado</h2>
@@ -68,10 +69,10 @@ export default function Privacidade() {
 
         <h2>Base legal e seus direitos (LGPD)</h2>
         <p>
-          Tratamos os dados com base no seu consentimento ao enviar as fotos (art. 7º, I, da Lei 13.709/2018) e
-          no legítimo interesse para segurança e prevenção de abuso (art. 7º, IX). Você pode pedir informações,
-          correção ou exclusão de dados, e revogar o consentimento, pelo e-mail abaixo. Como não guardamos as
-          fotos, normalmente não há nada armazenado para excluir.
+          Tratamos os dados com base no seu consentimento ao enviar as fotos (art. 7º, I, da Lei 13.709/2018)
+          e no legítimo interesse para segurança e prevenção de abuso (art. 7º, IX). Você pode pedir
+          informações, correção ou exclusão de dados, e revogar o consentimento, pelo e-mail abaixo. Como não
+          guardamos as fotos, normalmente não há nada armazenado para excluir.
         </p>
 
         <h2>Contato</h2>

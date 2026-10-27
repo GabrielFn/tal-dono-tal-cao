@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { configPublica } from "@/lib/config/publico";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://taldonotalcao.com.br";
+const SITE = configPublica.siteUrl;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),

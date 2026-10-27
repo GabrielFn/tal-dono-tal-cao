@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Rodape from "@/components/Rodape";
+import { configPublica } from "@/lib/config/publico";
 
 export const metadata: Metadata = { title: "Termos de Uso — Tal Dono, Tal Cão" };
 
-const EMAIL = process.env.NEXT_PUBLIC_CONTATO_EMAIL || "contato@taldonotalcao.com.br";
+const EMAIL = configPublica.contatoEmail;
 
 export default function Termos() {
   return (
@@ -18,8 +19,8 @@ export default function Termos() {
 
         <h2>1. O que é</h2>
         <p>
-          O Tal Dono, Tal Cão é um site de entretenimento. Uma inteligência artificial compara uma foto sua com
-          uma foto do seu cachorro e gera uma nota e comentários bem-humorados.
+          O Tal Dono, Tal Cão é um site de entretenimento. Uma inteligência artificial compara uma foto sua
+          com uma foto do seu cachorro e gera uma nota e comentários bem-humorados.
         </p>
 
         <h2>2. É só diversão</h2>
