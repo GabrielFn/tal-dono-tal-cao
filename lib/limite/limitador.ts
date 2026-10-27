@@ -15,6 +15,8 @@ export type Bloqueio = { permitido: false; motivo: "ip" | "global" };
 export type OpcoesLimitador = {
   limitePorIp: number;
   limiteGlobal: number;
+  /** Separa contadores de usos diferentes (ex.: "pix:"). Vazio = análise. */
+  prefixo?: string;
   agora?: () => number;
 };
 
@@ -62,6 +64,6 @@ export class LimitadorDeUso {
   /** O dia "vira" à meia-noite de Brasília. */
   private chaveDoDia(sufixo: string): string {
     const dia = new Date(this.agora() + FUSO_BRASILIA_MS).toISOString().slice(0, 10);
-    return `tdtc:${sufixo}:${dia}`;
+    return `tdtc:${this.opcoes.prefixo ?? ""}${sufixo}:${dia}`;
   }
 }

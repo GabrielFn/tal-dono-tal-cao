@@ -25,7 +25,24 @@ export type Acao =
   | { tipo: "analise_iniciada" }
   | { tipo: "analise_concluida"; resultado: ResultadoValido }
   | { tipo: "analise_falhou"; mensagem: string }
+  | { tipo: "restaurar"; resultado: ResultadoValido; fotos: { pessoa: string; cachorro: string } }
   | { tipo: "recomecar" };
+
+/** O que fica salvo na sessão da aba para o resultado sobreviver a um recarregamento. */
+export type ResultadoSalvo = { resultado: ResultadoValido; fotos: { pessoa: string; cachorro: string } };
+
+export function resultadoSalvoValido(valor: unknown): valor is ResultadoSalvo {
+  const v = valor as ResultadoSalvo | null;
+  return Boolean(
+    v &&
+    v.resultado?.valido === true &&
+    typeof v.resultado.nota === "number" &&
+    typeof v.fotos?.pessoa === "string" &&
+    v.fotos.pessoa.startsWith("data:image/") &&
+    typeof v.fotos?.cachorro === "string" &&
+    v.fotos.cachorro.startsWith("data:image/"),
+  );
+}
 
 export const ESTADO_INICIAL: Estado = {
   etapa: "inicio",
@@ -85,6 +102,8 @@ export function reducer(estado: Estado, acao: Acao): Estado {
       return { ...estado, etapa: "resultado", resultado: acao.resultado };
     case "analise_falhou":
       return { ...estado, etapa: "inicio", aviso: acao.mensagem };
+    case "restaurar":
+      return { ...ESTADO_INICIAL, etapa: "resultado", resultado: acao.resultado, fotos: acao.fotos };
     case "recomecar":
       return ESTADO_INICIAL;
   }

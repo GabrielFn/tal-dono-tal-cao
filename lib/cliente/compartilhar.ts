@@ -22,13 +22,25 @@ export function textoDeCompartilhamento(
   return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl}`;
 }
 
-/** Devolve "compartilhado", "cancelado" ou "baixado" (quando o aparelho não suporta compartilhar arquivos). */
-export async function compartilharImagem(
+/** Baixa um Blob com o nome dado (cria e libera a URL temporária). */
+export function baixarBlob(blob: Blob, nome: string): void {
+  const url = URL.createObjectURL(blob);
+  baixarArquivo(url, nome);
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+export type ResultadoCompartilhar = "compartilhado" | "cancelado" | "baixado";
+
+/**
+ * Abre o menu de compartilhar do celular com o arquivo. Se o aparelho não suportar,
+ * baixa o arquivo. Devolve o que aconteceu.
+ */
+export async function compartilharArquivo(
   blob: Blob,
-  urlObjeto: string,
+  nome: string,
   texto: string,
-): Promise<"compartilhado" | "cancelado" | "baixado"> {
-  const arquivo = new File([blob], NOME_ARQUIVO_CARD, { type: blob.type || "image/png" });
+): Promise<ResultadoCompartilhar> {
+  const arquivo = new File([blob], nome, { type: blob.type || "application/octet-stream" });
 
   if (navigator.canShare?.({ files: [arquivo] })) {
     try {
@@ -40,6 +52,11 @@ export async function compartilharImagem(
     }
   }
 
-  baixarArquivo(urlObjeto);
+  baixarBlob(blob, nome);
   return "baixado";
+}
+
+/** Atalho para o card (mantém o nome de arquivo padrão). */
+export function compartilharImagem(blob: Blob, texto: string): Promise<ResultadoCompartilhar> {
+  return compartilharArquivo(blob, NOME_ARQUIVO_CARD, texto);
 }

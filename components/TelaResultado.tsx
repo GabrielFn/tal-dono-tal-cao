@@ -1,6 +1,7 @@
 "use client";
 
 import Medidor from "./Medidor";
+import PainelPremium from "./PainelPremium";
 import { useCard } from "@/hooks/useCard";
 import { baixarArquivo, compartilharImagem, textoDeCompartilhamento } from "@/lib/cliente/compartilhar";
 import { configPublica } from "@/lib/config/publico";
@@ -10,6 +11,7 @@ type Props = {
   resultado: ResultadoValido;
   fotoPessoa: string;
   fotoCachorro: string;
+  precoPremiumCentavos: number;
   onRecomecar: () => void;
 };
 
@@ -32,12 +34,15 @@ function Categorias({ categorias }: Pick<ResultadoValido, "categorias">) {
   );
 }
 
-function AreaDoCard({ resultado, fotoPessoa, fotoCachorro }: Omit<Props, "onRecomecar">) {
+function AreaDoCard({
+  resultado,
+  fotoPessoa,
+  fotoCachorro,
+}: Pick<Props, "resultado" | "fotoPessoa" | "fotoCachorro">) {
   const { card, erro } = useCard(resultado, fotoPessoa, fotoCachorro);
 
   const compartilhar = () =>
-    card &&
-    compartilharImagem(card.blob, card.url, textoDeCompartilhamento(resultado, configPublica.siteUrl));
+    card && compartilharImagem(card.blob, textoDeCompartilhamento(resultado, configPublica.siteUrl));
 
   return (
     <div className="card-area">
@@ -62,7 +67,13 @@ function AreaDoCard({ resultado, fotoPessoa, fotoCachorro }: Omit<Props, "onReco
   );
 }
 
-export default function TelaResultado({ resultado, fotoPessoa, fotoCachorro, onRecomecar }: Props) {
+export default function TelaResultado({
+  resultado,
+  fotoPessoa,
+  fotoCachorro,
+  precoPremiumCentavos,
+  onRecomecar,
+}: Props) {
   return (
     <section className="resultado">
       {resultado.demo && <p className="selo-demo">Modo demonstração: resultado de exemplo, sem IA real.</p>}
@@ -97,6 +108,13 @@ export default function TelaResultado({ resultado, fotoPessoa, fotoCachorro, onR
 
       <Categorias categorias={resultado.categorias} />
       <AreaDoCard resultado={resultado} fotoPessoa={fotoPessoa} fotoCachorro={fotoCachorro} />
+
+      <PainelPremium
+        resultado={resultado}
+        fotoPessoa={fotoPessoa}
+        fotoBicho={fotoCachorro}
+        precoCentavos={precoPremiumCentavos}
+      />
 
       <button className="botao botao-texto" onClick={onRecomecar}>
         Testar outra dupla

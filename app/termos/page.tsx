@@ -48,12 +48,31 @@ export default function Termos() {
           fotos que envia e pelo que compartilha.
         </p>
 
-        <h2>6. Privacidade</h2>
+        <h2>6. Pacote Premium (compras)</h2>
+        <ul>
+          <li>
+            O Pacote Premium é um conteúdo digital: o Certificado Oficial de Sósia e o vídeo animado do seu
+            resultado. O preço aparece antes da compra e o pagamento é único, por Pix, processado pelo Mercado
+            Pago.
+          </li>
+          <li>
+            A liberação é automática assim que o Pix é confirmado. Os itens são gerados no seu aparelho e o
+            acesso vale para a aba do navegador em que você comprou. Baixe os arquivos antes de fechar a aba.
+          </li>
+          <li>
+            Se o pagamento foi feito e os itens não foram liberados, ou se você se arrependeu, peça o
+            reembolso em até 7 dias pelo e-mail de contato, informando o e-mail usado na compra. Devolvemos o
+            valor pelo próprio Pix.
+          </li>
+          <li>Assim como o resultado gratuito, o conteúdo premium é só diversão e não tem valor oficial.</li>
+        </ul>
+
+        <h2>7. Privacidade</h2>
         <p>
           Veja como tratamos seus dados na <Link href="/privacidade">Política de Privacidade</Link>.
         </p>
 
-        <h2>7. Contato</h2>
+        <h2>8. Contato</h2>
         <p>
           <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
         </p>

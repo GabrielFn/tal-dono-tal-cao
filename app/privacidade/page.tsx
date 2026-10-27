@@ -51,8 +51,24 @@ export default function Privacidade() {
         <p>
           Para fazer a análise, as fotos são enviadas a um provedor de inteligência artificial (Anthropic, nos
           Estados Unidos), que as processa e devolve o resultado, conforme os termos comerciais desse
-          provedor. O site é hospedado na Vercel. Isso envolve transferência internacional de dados, feita
-          apenas na medida necessária para prestar o serviço que você pediu.
+          provedor. Pagamentos são processados pelo Mercado Pago. O site é hospedado na Vercel. Isso envolve
+          transferência internacional de dados, feita apenas na medida necessária para prestar o serviço que
+          você pediu.
+        </p>
+
+        <h2>Compras (Pacote Premium)</h2>
+        <p>
+          Para gerar o Pix, pedimos seu e-mail, que é exigido pelo Mercado Pago para emitir o comprovante. O
+          e-mail é enviado ao Mercado Pago junto com a cobrança e não é guardado por nós. Dados bancários do
+          pagamento ficam apenas com o seu banco e com o Mercado Pago. Os itens premium (certificado e vídeo)
+          são gerados no seu próprio aparelho.
+        </p>
+
+        <h2>O que fica no seu aparelho</h2>
+        <p>
+          Para você não perder o resultado ao sair para pagar o Pix no app do banco, o resultado, as fotos
+          reduzidas e o andamento da compra ficam guardados temporariamente no armazenamento da aba do seu
+          navegador. Tudo é apagado quando você fecha a aba ou toca em &quot;Testar outra dupla&quot;.
         </p>
 
         <h2>O card gerado</h2>

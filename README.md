@@ -40,17 +40,30 @@ Abra http://localhost:3000. Sem `ANTHROPIC_API_KEY`, o app roda em **modo demo**
 6. **Domínio:** em **Settings → Domains**, adicione seu domínio (ex.: comprado no Registro.br) e siga as instruções de DNS.
 7. **Na Anthropic:** em _Billing_, coloque créditos e defina um **limite de gasto mensal**, para nunca ter surpresa.
 
+## Pacote Premium (Pix)
+
+Depois do resultado, a pessoa pode comprar por **R$ 4,90** (configurável) um **Certificado Oficial de Sósia** com os nomes dela e do pet e um **vídeo animado de 7 s** (MP4, 1080x1920) para Reels e TikTok.
+
+- **Pagamento:** Pix pela API Orders do Mercado Pago. A tela consulta o status a cada 4 s e também na hora em que a pessoa volta do app do banco. Não precisa de webhook nem de banco de dados.
+- **Sem token = modo demo:** o Pix libera sozinho em ~8 s e a tela avisa que é demonstração. Bom para testar o fluxo antes de configurar o Mercado Pago.
+- **Para cobrar de verdade:** cadastre `MERCADOPAGO_ACCESS_TOKEN` (credencial de **produção**, começa com `APP_USR-`) na Vercel e faça um Redeploy. A conta do Mercado Pago precisa ter uma **chave Pix cadastrada**.
+- **Reembolso:** pelo painel do Mercado Pago (Atividade → pagamento → Devolver). A referência `tdtc-...` aparece em cada cobrança.
+- **Escolha de projeto:** o certificado e o vídeo são gerados **no aparelho da pessoa**. Assim nenhuma foto é guardada no servidor (melhor para a LGPD e custo zero de processamento). A contrapartida é que um desenvolvedor experiente conseguiria liberar os itens mexendo no JavaScript da página. Para um item de R$ 4,90 comprado por impulso, esse risco é aceitável.
+- **Persistência:** resultado e andamento da compra ficam no `sessionStorage` da aba, para sobreviver à ida ao app do banco. Somem ao fechar a aba.
+
 ## Onde mexer
 
-| O que                                   | Arquivo                                             |
-| --------------------------------------- | --------------------------------------------------- |
-| Tom do humor, regras e categorias da IA | `lib/analise/prompt.ts`                             |
-| Visual do card compartilhado            | `lib/cliente/card.ts` (posições no objeto `LAYOUT`) |
-| Tela inicial / tela de resultado        | `components/TelaInicio.tsx`, `TelaResultado.tsx`    |
-| Cores e estilo                          | `app/globals.css`                                   |
-| Limites e variáveis de ambiente         | `lib/config/servidor.ts`, `lib/config/publico.ts`   |
-| Textos legais                           | `app/privacidade/page.tsx`, `app/termos/page.tsx`   |
-| Resultados do modo demo                 | `lib/analise/demo.ts`                               |
+| O que                                   | Arquivo                                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------ |
+| Tom do humor, regras e categorias da IA | `lib/analise/prompt.ts`                                                        |
+| Visual do card compartilhado            | `lib/cliente/card.ts` (posições no objeto `LAYOUT`)                            |
+| Tela inicial / tela de resultado        | `components/TelaInicio.tsx`, `TelaResultado.tsx`                               |
+| Cores e estilo                          | `app/globals.css`                                                              |
+| Limites e variáveis de ambiente         | `lib/config/servidor.ts`, `lib/config/publico.ts`                              |
+| Textos legais                           | `app/privacidade/page.tsx`, `app/termos/page.tsx`                              |
+| Preço, Pix e limites do premium         | variáveis `PRECO_PREMIUM_CENTAVOS`, `MERCADOPAGO_ACCESS_TOKEN`, `LIMITE_PIX_*` |
+| Certificado / vídeo                     | `lib/cliente/certificado.ts`, `lib/cliente/video.ts`                           |
+| Resultados do modo demo                 | `lib/analise/demo.ts`                                                          |
 
 ## Arquitetura
 
@@ -59,6 +72,7 @@ app/api/analisar/route.ts   Adaptador HTTP (fino): lê o corpo, monta dependênc
 lib/analise/servico.ts      Caso de uso: valida → reserva cota → chama IA → devolve cota se falhar
 lib/analise/                Strategy AnalisadorDeFotos: AnalisadorAnthropic | AnalisadorDemo (+ factory)
 lib/analise/normalizar.ts   Camada anticorrupção: resposta da IA → Resultado confiável
+lib/pagamento/              Strategy ProvedorPix: ProvedorMercadoPago | ProvedorPixDemo (+ factory e casos de uso)
 lib/limite/                 LimitadorDeUso + contadores (Memória | Upstash, com Decorator de fallback)
 lib/config/                 Variáveis de ambiente lidas e validadas num só lugar
 lib/cliente/                Código do navegador: reducer da tela, cliente HTTP, card, compartilhar

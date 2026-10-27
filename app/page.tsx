@@ -1,7 +1,10 @@
 import App from "@/components/App";
 import Rodape from "@/components/Rodape";
+import { lerConfigServidor } from "@/lib/config/servidor";
 
 export default function Home() {
+  // O preço vem do servidor (variável PRECO_PREMIUM_CENTAVOS) para não ficar duplicado.
+  const { precoPremiumCentavos } = lerConfigServidor().pagamento;
   return (
     <main className="pagina">
       <header className="cabecalho">
@@ -12,7 +15,7 @@ export default function Home() {
         <p className="subtitulo">Duas fotos, uma IA e a verdade que todo mundo já desconfiava.</p>
       </header>
 
-      <App />
+      <App precoPremiumCentavos={precoPremiumCentavos} />
 
       <section className="como-funciona" aria-labelledby="como">
         <h2 id="como">Como funciona</h2>

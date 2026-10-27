@@ -1,23 +1,25 @@
-// Desenha o card 1080x1920 (formato Stories/TikTok) no navegador.
+// Cena 1080x1920 (formato Stories/TikTok). O card é a cena completa; o vídeo anima a mesma cena.
 import type { ResultadoValido } from "@/lib/tipos";
+import {
+  ajustarFonte,
+  canvasParaBlob,
+  carregarImagem,
+  circulo,
+  COR,
+  criarCanvas,
+  escreverLinhas,
+  fonte,
+  fotoEmCirculo,
+  quebrarTexto,
+  retanguloArredondado,
+  type Ctx,
+} from "./desenho";
 
-const LARGURA = 1080;
-const ALTURA = 1920;
-const CENTRO_X = LARGURA / 2;
-const FONTE = `"Arial Rounded MT Bold", "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif`;
+export const LARGURA_CENA = 1080;
+export const ALTURA_CENA = 1920;
+const CENTRO_X = LARGURA_CENA / 2;
 
-const COR = {
-  fundo: "#FFF3E0",
-  tinta: "#2A1A10",
-  tintaSuave: "rgba(42,26,16,0.8)",
-  bolinhas: "rgba(42,26,16,0.06)",
-  laranja: "#FF6B2C",
-  verde: "#17A398",
-  amarelo: "#FFC93C",
-  branco: "#FFFFFF",
-} as const;
-
-/** Posições de cada elemento. Mude aqui para reorganizar o card. */
+/** Posições de cada elemento. Mude aqui para reorganizar o card (e o vídeo). */
 const LAYOUT = {
   marca: { y: 150, tamanho: 54 },
   fotos: { y: 560, raio: 220, xPessoa: 300, xCachorro: 780, borda: 10, sombra: 14 },
@@ -32,49 +34,64 @@ const LAYOUT = {
   plotTwist: { y: 250, altura: 76, rotacao: -0.05, tamanhoMax: 38, tamanhoMin: 22, larguraMax: 860 },
 } as const;
 
-type Ctx = CanvasRenderingContext2D;
+export type DadosCena = Pick<
+  ResultadoValido,
+  "nota" | "titulo" | "fraseCard" | "somDoAnimal" | "ehCachorro" | "especie"
+>;
 
-function fonte(peso: number, tamanho: number): string {
-  return `${peso} ${tamanho}px ${FONTE}`;
-}
+export type ImagensCena = { pessoa: HTMLImageElement; bicho: HTMLImageElement };
 
-function quebrarTexto(ctx: Ctx, texto: string, largura: number): string[] {
-  const linhas: string[] = [];
-  let linha = "";
-  for (const palavra of texto.split(/\s+/)) {
-    const teste = linha ? `${linha} ${palavra}` : palavra;
-    if (ctx.measureText(teste).width > largura && linha) {
-      linhas.push(linha);
-      linha = palavra;
-    } else {
-      linha = teste;
-    }
+/**
+ * Progresso de cada elemento, de 0 (invisível) a 1 (no lugar).
+ * Valores acima de 1 são permitidos em escalas, para o efeito de "pulo".
+ */
+export type Animacao = {
+  marca: number;
+  fotos: number;
+  etiquetas: number;
+  selo: number;
+  nota: number;
+  legenda: number;
+  plotTwist: number;
+  titulo: number;
+  frase: number;
+  rodape: number;
+};
+
+export const CENA_COMPLETA: Animacao = {
+  marca: 1,
+  fotos: 1,
+  etiquetas: 1,
+  selo: 1,
+  nota: 1,
+  legenda: 1,
+  plotTwist: 1,
+  titulo: 1,
+  frase: 1,
+  rodape: 1,
+};
+
+/** Desenha algo com transparência e escala em torno de (cx, cy). Não desenha nada se p <= 0. */
+function comEfeito(ctx: Ctx, p: number, cx: number, cy: number, escala: number, desenhar: () => void) {
+  if (p <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, p);
+  if (escala !== 1) {
+    ctx.translate(cx, cy);
+    ctx.scale(escala, escala);
+    ctx.translate(-cx, -cy);
   }
-  if (linha) linhas.push(linha);
-  return linhas;
-}
-
-function circulo(ctx: Ctx, x: number, y: number, raio: number, cor: string) {
-  ctx.fillStyle = cor;
-  ctx.beginPath();
-  ctx.arc(x, y, raio, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-async function carregarImagem(src: string): Promise<HTMLImageElement> {
-  const img = new Image();
-  img.src = src;
-  await img.decode();
-  return img;
+  desenhar();
+  ctx.restore();
 }
 
 function desenharFundo(ctx: Ctx) {
   const { espaco, raio } = LAYOUT.bolinhas;
   ctx.fillStyle = COR.fundo;
-  ctx.fillRect(0, 0, LARGURA, ALTURA);
-  for (let y = espaco / 2, linha = 0; y < ALTURA; y += espaco, linha++) {
+  ctx.fillRect(0, 0, LARGURA_CENA, ALTURA_CENA);
+  for (let y = espaco / 2, linha = 0; y < ALTURA_CENA; y += espaco, linha++) {
     const deslocamento = linha % 2 ? espaco / 2 : espaco;
-    for (let x = deslocamento; x < LARGURA; x += espaco) circulo(ctx, x, y, raio, COR.bolinhas);
+    for (let x = deslocamento; x < LARGURA_CENA; x += espaco) circulo(ctx, x, y, raio, COR.bolinhas);
   }
 }
 
@@ -84,22 +101,11 @@ function desenharMarca(ctx: Ctx) {
   ctx.fillText("TAL DONO, TAL CÃO", CENTRO_X, LAYOUT.marca.y);
 }
 
-function desenharFotoCircular(ctx: Ctx, img: HTMLImageElement, cx: number) {
+function desenharFoto(ctx: Ctx, img: HTMLImageElement, cx: number) {
   const { y: cy, raio, borda, sombra } = LAYOUT.fotos;
   circulo(ctx, cx + sombra, cy + sombra, raio + borda, COR.tinta);
   circulo(ctx, cx, cy, raio + borda, COR.tinta);
-
-  // Recorte quadrado central (object-fit: cover), levemente para cima, onde costumam ficar os rostos.
-  const lado = Math.min(img.naturalWidth, img.naturalHeight);
-  const sx = (img.naturalWidth - lado) / 2;
-  const sy = Math.max(0, (img.naturalHeight - lado) / 2.6);
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, raio, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.drawImage(img, sx, sy, lado, lado, cx - raio, cy - raio, raio * 2, raio * 2);
-  ctx.restore();
+  fotoEmCirculo(ctx, img, cx, cy, raio);
 }
 
 function desenharEtiqueta(ctx: Ctx, texto: string, cx: number, cor: string) {
@@ -108,48 +114,27 @@ function desenharEtiqueta(ctx: Ctx, texto: string, cx: number, cor: string) {
   const largura = ctx.measureText(texto).width + 60;
   const x = cx - largura / 2;
   const y = cy - altura / 2;
-
-  ctx.fillStyle = COR.tinta;
-  ctx.beginPath();
-  ctx.roundRect(x + 6, y + 6, largura, altura, altura / 2);
-  ctx.fill();
-
-  ctx.fillStyle = cor;
-  ctx.beginPath();
-  ctx.roundRect(x, y, largura, altura, altura / 2);
-  ctx.fill();
+  retanguloArredondado(ctx, x + 6, y + 6, largura, altura, altura / 2, COR.tinta);
+  retanguloArredondado(ctx, x, y, largura, altura, altura / 2, cor);
   ctx.strokeStyle = COR.tinta;
   ctx.lineWidth = 5;
   ctx.stroke();
-
   ctx.fillStyle = COR.branco;
   ctx.fillText(texto, cx, cy + 2);
 }
 
-/** Selo inclinado "PLOT TWIST: É UM GATO!" quando o bicho não é cachorro. */
+/** Selo inclinado "PLOT TWIST: É GATO!" quando o bicho não é cachorro. */
 function desenharSeloPlotTwist(ctx: Ctx, especie: string) {
   const p = LAYOUT.plotTwist;
   const texto = `PLOT TWIST: É ${especie.toLocaleUpperCase("pt-BR")}!`;
-
-  let tamanho: number = p.tamanhoMax;
-  ctx.font = fonte(900, tamanho);
-  while (ctx.measureText(texto).width > p.larguraMax - 60 && tamanho > p.tamanhoMin) {
-    tamanho -= 2;
-    ctx.font = fonte(900, tamanho);
-  }
+  ajustarFonte(ctx, texto, { peso: 900, max: p.tamanhoMax, min: p.tamanhoMin, largura: p.larguraMax - 60 });
   const largura = ctx.measureText(texto).width + 60;
 
   ctx.save();
   ctx.translate(CENTRO_X, p.y);
   ctx.rotate(p.rotacao);
-  ctx.fillStyle = COR.tinta;
-  ctx.beginPath();
-  ctx.roundRect(-largura / 2 + 7, -p.altura / 2 + 7, largura, p.altura, 14);
-  ctx.fill();
-  ctx.fillStyle = COR.amarelo;
-  ctx.beginPath();
-  ctx.roundRect(-largura / 2, -p.altura / 2, largura, p.altura, 14);
-  ctx.fill();
+  retanguloArredondado(ctx, -largura / 2 + 7, -p.altura / 2 + 7, largura, p.altura, 14, COR.tinta);
+  retanguloArredondado(ctx, -largura / 2, -p.altura / 2, largura, p.altura, 14, COR.amarelo);
   ctx.lineWidth = 5;
   ctx.strokeStyle = COR.tinta;
   ctx.stroke();
@@ -178,105 +163,115 @@ function desenharNota(ctx: Ctx, nota: number) {
   ctx.lineJoin = "round";
   ctx.lineWidth = contorno;
   ctx.strokeStyle = COR.tinta;
-
-  // Sombra deslocada
   ctx.fillStyle = COR.tinta;
   ctx.strokeText(texto, CENTRO_X + sombra, y + sombra);
   ctx.fillText(texto, CENTRO_X + sombra, y + sombra);
-  // Número principal
   ctx.strokeText(texto, CENTRO_X, y);
   ctx.fillStyle = COR.laranja;
   ctx.fillText(texto, CENTRO_X, y);
+}
 
+function desenharLegenda(ctx: Ctx) {
   ctx.fillStyle = COR.tinta;
   ctx.font = fonte(800, LAYOUT.legenda.tamanho);
   ctx.fillText("PARECIDOS", CENTRO_X, LAYOUT.legenda.y);
 }
 
-/** Escreve linhas centralizadas e devolve o y depois da última linha. */
-function escreverLinhas(ctx: Ctx, linhas: string[], yInicial: number, alturaLinha: number): number {
-  let y = yInicial;
-  for (const linha of linhas) {
-    ctx.fillText(linha, CENTRO_X, y);
-    y += alturaLinha;
-  }
-  return y;
-}
-
-function desenharTextos(ctx: Ctx, titulo: string, frase: string) {
+/** Desenha o título e devolve o y onde a frase deve começar. */
+function desenharTitulo(ctx: Ctx, titulo: string): number {
   const t = LAYOUT.titulo;
   ctx.fillStyle = COR.tinta;
   ctx.font = fonte(900, t.tamanho);
-  const yDepoisDoTitulo = escreverLinhas(
-    ctx,
-    quebrarTexto(ctx, titulo, t.largura).slice(0, t.maxLinhas),
-    t.y,
-    t.alturaLinha,
-  );
+  const linhas = quebrarTexto(ctx, titulo, t.largura).slice(0, t.maxLinhas);
+  return escreverLinhas(ctx, linhas, CENTRO_X, t.y, t.alturaLinha);
+}
 
-  if (!frase) return;
+function alturaDoTitulo(ctx: Ctx, titulo: string): number {
+  const t = LAYOUT.titulo;
+  ctx.font = fonte(900, t.tamanho);
+  return t.y + quebrarTexto(ctx, titulo, t.largura).slice(0, t.maxLinhas).length * t.alturaLinha;
+}
+
+function desenharFrase(ctx: Ctx, frase: string, yInicial: number) {
   const f = LAYOUT.frase;
   ctx.fillStyle = COR.tintaSuave;
   ctx.font = fonte(600, f.tamanho);
-  escreverLinhas(
-    ctx,
-    quebrarTexto(ctx, `“${frase}”`, f.largura).slice(0, f.maxLinhas),
-    yDepoisDoTitulo + f.espaco,
-    f.alturaLinha,
-  );
+  const linhas = quebrarTexto(ctx, `“${frase}”`, f.largura).slice(0, f.maxLinhas);
+  escreverLinhas(ctx, linhas, CENTRO_X, yInicial + f.espaco, f.alturaLinha);
 }
 
 function desenharRodape(ctx: Ctx, dominio: string) {
   const r = LAYOUT.rodape;
-  ctx.fillStyle = COR.tinta;
-  ctx.beginPath();
-  ctx.roundRect(r.x, r.y, r.largura, r.altura, r.altura / 2);
-  ctx.fill();
-
+  retanguloArredondado(ctx, r.x, r.y, r.largura, r.altura, r.altura / 2, COR.tinta);
   const texto = `Descubra o seu em ${dominio}`;
-  let tamanho: number = r.tamanhoMax;
-  ctx.font = fonte(800, tamanho);
-  while (ctx.measureText(texto).width > r.larguraTexto && tamanho > r.tamanhoMin) {
-    tamanho -= 2;
-    ctx.font = fonte(800, tamanho);
-  }
+  ajustarFonte(ctx, texto, { peso: 800, max: r.tamanhoMax, min: r.tamanhoMin, largura: r.larguraTexto });
   ctx.fillStyle = COR.branco;
   ctx.fillText(texto, CENTRO_X, r.y + r.altura / 2 + 2);
 }
 
+/** Desenha a cena inteira de acordo com o progresso de cada elemento. */
+export function desenharCena(
+  ctx: Ctx,
+  dados: DadosCena,
+  imagens: ImagensCena,
+  dominio: string,
+  a: Animacao = CENA_COMPLETA,
+) {
+  const { fotos, etiquetas, nota } = LAYOUT;
+  desenharFundo(ctx);
+  comEfeito(ctx, a.marca, CENTRO_X, LAYOUT.marca.y, 1, () => desenharMarca(ctx));
+
+  // Fotos entram pelas laterais.
+  if (a.fotos > 0) {
+    const deslocamento = (1 - a.fotos) * 700;
+    comEfeito(ctx, a.fotos, 0, 0, 1, () => {
+      ctx.translate(-deslocamento, 0);
+      desenharFoto(ctx, imagens.pessoa, fotos.xPessoa);
+      ctx.translate(deslocamento * 2, 0);
+      desenharFoto(ctx, imagens.bicho, fotos.xCachorro);
+    });
+  }
+  comEfeito(ctx, a.etiquetas, CENTRO_X, etiquetas.y, 1, () => {
+    desenharEtiqueta(ctx, "EU", fotos.xPessoa, COR.verde);
+    desenharEtiqueta(ctx, dados.somDoAnimal, fotos.xCachorro, COR.laranja);
+  });
+  comEfeito(ctx, Math.min(1, a.selo), CENTRO_X, fotos.y, a.selo, () => desenharSelo(ctx));
+
+  // A nota "conta" de 0 até o valor final.
+  comEfeito(ctx, Math.min(1, a.nota * 3), CENTRO_X, nota.y, 1, () =>
+    desenharNota(ctx, Math.round(dados.nota * Math.min(1, a.nota))),
+  );
+  comEfeito(ctx, a.legenda, CENTRO_X, LAYOUT.legenda.y, 1, () => desenharLegenda(ctx));
+
+  const yFrase = alturaDoTitulo(ctx, dados.titulo);
+  comEfeito(ctx, Math.min(1, a.titulo), CENTRO_X, LAYOUT.titulo.y, a.titulo, () =>
+    desenharTitulo(ctx, dados.titulo),
+  );
+  if (dados.fraseCard)
+    comEfeito(ctx, a.frase, CENTRO_X, yFrase, 1, () => desenharFrase(ctx, dados.fraseCard, yFrase));
+  comEfeito(ctx, a.rodape, CENTRO_X, LAYOUT.rodape.y, 1, () => desenharRodape(ctx, dominio));
+
+  // O selo "carimba" por cima de tudo, por isso vem por último.
+  if (!dados.ehCachorro) {
+    comEfeito(ctx, Math.min(1, a.plotTwist), CENTRO_X, LAYOUT.plotTwist.y, a.plotTwist, () =>
+      desenharSeloPlotTwist(ctx, dados.especie),
+    );
+  }
+}
+
+export async function carregarImagensCena(fotoPessoa: string, fotoBicho: string): Promise<ImagensCena> {
+  const [pessoa, bicho] = await Promise.all([carregarImagem(fotoPessoa), carregarImagem(fotoBicho)]);
+  return { pessoa, bicho };
+}
+
 export async function gerarCard(
-  resultado: ResultadoValido,
+  resultado: DadosCena,
   fotoPessoa: string,
   fotoCachorro: string,
   dominio: string,
 ): Promise<Blob> {
-  const [imgPessoa, imgCachorro] = await Promise.all([
-    carregarImagem(fotoPessoa),
-    carregarImagem(fotoCachorro),
-  ]);
-
-  const canvas = document.createElement("canvas");
-  canvas.width = LARGURA;
-  canvas.height = ALTURA;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas indisponível neste navegador");
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  desenharFundo(ctx);
-  desenharMarca(ctx);
-  desenharFotoCircular(ctx, imgPessoa, LAYOUT.fotos.xPessoa);
-  desenharFotoCircular(ctx, imgCachorro, LAYOUT.fotos.xCachorro);
-  desenharEtiqueta(ctx, "EU", LAYOUT.fotos.xPessoa, COR.verde);
-  desenharEtiqueta(ctx, resultado.somDoAnimal, LAYOUT.fotos.xCachorro, COR.laranja);
-  if (!resultado.ehCachorro) desenharSeloPlotTwist(ctx, resultado.especie);
-  desenharSelo(ctx);
-  desenharNota(ctx, resultado.nota);
-  desenharTextos(ctx, resultado.titulo, resultado.fraseCard);
-  desenharRodape(ctx, dominio);
-
-  return new Promise((ok, falha) =>
-    canvas.toBlob((blob) => (blob ? ok(blob) : falha(new Error("Falha ao gerar o card"))), "image/png"),
-  );
+  const imagens = await carregarImagensCena(fotoPessoa, fotoCachorro);
+  const { canvas, ctx } = criarCanvas(LARGURA_CENA, ALTURA_CENA);
+  desenharCena(ctx, resultado, imagens, dominio);
+  return canvasParaBlob(canvas);
 }

@@ -36,3 +36,19 @@ export type ResultadoInvalido = {
 export type Resultado = ResultadoValido | ResultadoInvalido;
 
 export type RespostaErro = { erro: string; codigo: string };
+
+// ---- Pagamento (premium) ----
+
+export type StatusCobranca = "pendente" | "pago" | "expirado" | "cancelado" | "falhou";
+
+/** O que a interface recebe ao criar uma cobrança Pix. */
+export type CobrancaPublica = {
+  id: string;
+  copiaECola: string;
+  qrCodeBase64: string;
+  expiraEm: string;
+  valorCentavos: number;
+  demo?: boolean;
+};
+
+export type RespostaStatusCobranca = { status: StatusCobranca };

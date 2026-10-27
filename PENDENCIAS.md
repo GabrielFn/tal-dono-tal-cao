@@ -7,12 +7,17 @@
 3. **Conta no GitHub e na Vercel** — para subir o código e publicar (passo a passo no README).
 4. **E-mail de contato** — exigido pela LGPD na política de privacidade.
 
+## Para cobrar o premium de verdade
+
+1. **Conta no Mercado Pago com chave Pix cadastrada.**
+2. **Access Token de produção** (começa com `APP_USR-`): developers → Suas integrações → Criar aplicação → Credenciais de produção. Cadastrar `MERCADOPAGO_ACCESS_TOKEN` na Vercel e fazer Redeploy. Enquanto não houver token, o premium roda em modo demo (libera sem cobrar e avisa na tela).
+3. **E-mail de contato real** em `NEXT_PUBLIC_CONTATO_EMAIL`: os termos prometem reembolso em até 7 dias por e-mail.
+4. **Fiscal:** vender conteúdo digital gera receita. Vale confirmar com um contador se compensa abrir MEI e se precisa emitir nota. (Não sou contador nem advogado.)
+5. **Primeira compra real:** fazer um Pix de teste e depois devolver pelo painel, para conferir o fluxo ponta a ponta. Use um e-mail **diferente** do da sua conta do Mercado Pago (o MP recusa quando pagador e recebedor são a mesma conta).
+
 ## Decisões (não bloqueiam, mas mudam o produto)
 
-5. **Monetização** — hoje é 100% grátis com marca d'água no card. Opções para a fase 2:
-   1. Pix via Mercado Pago para card sem marca d'água / versão em arte (R$ 5–10)
-   2. Anúncios (Google AdSense) na página de resultado
-   3. Parceria com pet shops/marcas (link de afiliado no resultado)
+5. **Monetização** — premium por Pix (R$ 4,90) implementado. Próximos candidatos: afiliados de pet shop no resultado e patrocínio de marca quando houver tráfego.
 6. **Limite grátis por dia** — deixei 5 análises por pessoa e 500 no total por dia. Ajustar conforme o orçamento.
 7. **Modelo da IA** — Haiku (mais barato) está como padrão. Testar com fotos reais e decidir se vale subir para Sonnet.
 

@@ -5,7 +5,7 @@ import TelaResultado from "./TelaResultado";
 import { useAnalise } from "@/hooks/useAnalise";
 
 /** Composição: escolhe a tela de acordo com a etapa. A lógica fica no hook useAnalise. */
-export default function App() {
+export default function App({ precoPremiumCentavos }: { precoPremiumCentavos: number }) {
   const { estado, prontoParaAnalisar, escolherFoto, analisar, recomecar } = useAnalise();
   const { resultado, fotos } = estado;
 
@@ -15,6 +15,7 @@ export default function App() {
         resultado={resultado}
         fotoPessoa={fotos.pessoa}
         fotoCachorro={fotos.cachorro}
+        precoPremiumCentavos={precoPremiumCentavos}
         onRecomecar={recomecar}
       />
     );
