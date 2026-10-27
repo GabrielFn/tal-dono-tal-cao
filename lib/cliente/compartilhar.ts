@@ -21,7 +21,7 @@ export function textoDeCompartilhamento(
     : resultado.especie === "gato"
       ? "meu gato 🐱"
       : "meu cachorro 🐶";
-  return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl}`;
+  return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl} #TalDonoTalPet`;
 }
 
 /** Baixa um Blob com o nome dado (cria e libera a URL temporária). */

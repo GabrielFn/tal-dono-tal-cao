@@ -117,6 +117,7 @@ describe("textoDeCompartilhamento", () => {
     expect(texto).toContain("87%");
     expect(texto).toContain("meu cachorro");
     expect(texto).toContain(site);
+    expect(texto).toContain("#TalDonoTalPet");
   });
 
   it("gato", () => {

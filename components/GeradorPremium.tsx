@@ -42,7 +42,7 @@ export default function GeradorPremium({ resultado, fotoPessoa, fotoBicho, codig
 
   useEffect(() => setSuportaVideo(Boolean(formatoDeVideoSuportado())), []);
 
-  const textoCompartilhar = `Agora é oficial: somos ${resultado.nota}% parecidos 🐾 Descubra o seu: ${configPublica.siteUrl}`;
+  const textoCompartilhar = `Agora é oficial: somos ${resultado.nota}% parecidos 🐾 Descubra o seu: ${configPublica.siteUrl} #TalDonoTalPet`;
 
   async function criarCertificado() {
     setErro(null);
