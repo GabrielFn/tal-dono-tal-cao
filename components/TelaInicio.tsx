@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SlotFoto from "./SlotFoto";
-import type { Estado, TipoFoto } from "@/lib/cliente/estado";
+import { mensagensDeAviso, type Estado, type TipoFoto } from "@/lib/cliente/estado";
 
 const MENSAGENS_CARREGANDO = [
   "Comparando olhares…",
@@ -38,6 +38,7 @@ type Props = {
 export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar }: Props) {
   const analisando = estado.etapa === "analisando";
   const mensagem = useMensagemRotativa(analisando);
+  const avisos = mensagensDeAviso(estado);
 
   return (
     <section className="inicio">
@@ -48,6 +49,7 @@ export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar 
           emoji="🤳"
           cor="var(--verde)"
           foto={estado.fotos.pessoa}
+          carregando={estado.carregando.pessoa}
           onEscolher={(arquivo) => onEscolherFoto(arquivo, "pessoa")}
         />
         <SlotFoto
@@ -56,14 +58,17 @@ export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar 
           emoji="🐶"
           cor="var(--laranja)"
           foto={estado.fotos.cachorro}
+          carregando={estado.carregando.cachorro}
           onEscolher={(arquivo) => onEscolherFoto(arquivo, "cachorro")}
         />
       </div>
 
-      {estado.aviso && (
-        <p className="aviso" role="alert">
-          {estado.aviso}
-        </p>
+      {avisos.length > 0 && (
+        <div className="aviso" role="alert">
+          {avisos.map((texto) => (
+            <p key={texto}>{texto}</p>
+          ))}
+        </div>
       )}
 
       <button

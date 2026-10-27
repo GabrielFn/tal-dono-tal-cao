@@ -10,10 +10,11 @@ export function useAnalise() {
   const [estado, despachar] = useReducer(reducer, ESTADO_INICIAL);
 
   const escolherFoto = useCallback(async (arquivo: File, foto: TipoFoto) => {
+    despachar({ tipo: "foto_carregando", foto });
     try {
       despachar({ tipo: "foto_escolhida", foto, dataUrl: await comprimirFoto(arquivo) });
     } catch (erro) {
-      despachar({ tipo: "aviso", mensagem: (erro as Error).message });
+      despachar({ tipo: "foto_falhou", foto, mensagem: (erro as Error).message });
     }
   }, []);
 

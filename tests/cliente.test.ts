@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { solicitarAnalise } from "@/lib/cliente/api";
 import { textoDeCompartilhamento } from "@/lib/cliente/compartilhar";
-import { ESTADO_INICIAL, podeAnalisar, reducer, type Estado } from "@/lib/cliente/estado";
+import { ESTADO_INICIAL, mensagensDeAviso, podeAnalisar, reducer, type Estado } from "@/lib/cliente/estado";
 import type { ResultadoValido } from "@/lib/tipos";
 import { fetchFalso } from "./auxiliares";
 
@@ -26,9 +26,39 @@ describe("reducer da tela", () => {
     expect(podeAnalisar(comFotos)).toBe(true);
   });
 
-  it("escolher foto limpa o aviso", () => {
-    const comAviso = { ...ESTADO_INICIAL, aviso: "erro" };
-    expect(reducer(comAviso, { tipo: "foto_escolhida", foto: "cachorro", dataUrl: "c" }).aviso).toBeNull();
+  it("começar a abrir uma foto limpa o aviso geral e o erro daquela foto", () => {
+    const comErros: Estado = {
+      ...ESTADO_INICIAL,
+      aviso: "erro geral",
+      errosFoto: { pessoa: "erro", cachorro: null },
+    };
+    const depois = reducer(comErros, { tipo: "foto_carregando", foto: "pessoa" });
+    expect(depois.aviso).toBeNull();
+    expect(depois.errosFoto.pessoa).toBeNull();
+    expect(depois.carregando.pessoa).toBe(true);
+  });
+
+  it("REGRESSÃO: o erro de uma foto não some quando a outra carrega", () => {
+    let estado = reducer(ESTADO_INICIAL, { tipo: "foto_carregando", foto: "pessoa" });
+    estado = reducer(estado, { tipo: "foto_falhou", foto: "pessoa", mensagem: "Não abriu" });
+    estado = reducer(estado, { tipo: "foto_carregando", foto: "cachorro" });
+    estado = reducer(estado, { tipo: "foto_escolhida", foto: "cachorro", dataUrl: "c" });
+    expect(mensagensDeAviso(estado)).toEqual(["Selfie: Não abriu"]);
+    expect(estado.carregando).toEqual({ pessoa: false, cachorro: false });
+  });
+
+  it("não deixa analisar enquanto uma foto ainda está abrindo", () => {
+    const abrindo = reducer(comFotos, { tipo: "foto_carregando", foto: "cachorro" });
+    expect(podeAnalisar(abrindo)).toBe(false);
+  });
+
+  it("junta erros das fotos e o erro geral nas mensagens", () => {
+    const estado: Estado = {
+      ...ESTADO_INICIAL,
+      aviso: "Volta amanhã",
+      errosFoto: { pessoa: null, cachorro: "Não abriu" },
+    };
+    expect(mensagensDeAviso(estado)).toEqual(["Foto do cachorro: Não abriu", "Volta amanhã"]);
   });
 
   it("segue o fluxo início → analisando → resultado", () => {

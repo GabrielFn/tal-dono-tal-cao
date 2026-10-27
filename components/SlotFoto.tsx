@@ -8,10 +8,11 @@ type Props = {
   emoji: string;
   cor: string;
   foto: string | null;
+  carregando?: boolean;
   onEscolher: (arquivo: File) => void;
 };
 
-export default function SlotFoto({ rotulo, dica, emoji, cor, foto, onEscolher }: Props) {
+export default function SlotFoto({ rotulo, dica, emoji, cor, foto, carregando = false, onEscolher }: Props) {
   const entrada = useRef<HTMLInputElement>(null);
 
   return (
@@ -20,8 +21,11 @@ export default function SlotFoto({ rotulo, dica, emoji, cor, foto, onEscolher }:
       className="slot"
       style={{ "--cor": cor } as CSSProperties}
       onClick={() => entrada.current?.click()}
+      disabled={carregando}
+      aria-busy={carregando}
       aria-label={foto ? `Trocar foto: ${rotulo}` : `Escolher foto: ${rotulo}`}
     >
+      {carregando && <span className="slot-carregando">Abrindo a foto…</span>}
       {foto ? (
         // eslint-disable-next-line @next/next/no-img-element -- data URL local, sem otimização do Next
         <img src={foto} alt={rotulo} className="slot-img" />
@@ -37,7 +41,7 @@ export default function SlotFoto({ rotulo, dica, emoji, cor, foto, onEscolher }:
       <input
         ref={entrada}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         hidden
         onChange={(e) => {
           const arquivo = e.target.files?.[0];
