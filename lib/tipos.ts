@@ -14,13 +14,13 @@ export type ResultadoValido = {
   fraseCard: string;
   racaProvavel: string;
   categorias: Categoria[];
-  /** false quando a foto é de outro bicho (gato, papagaio, iguana...). */
-  ehCachorro: boolean;
+  /** true para bicho fora do comum (não é cachorro nem gato): ganha o "plot twist". */
+  inusitado: boolean;
   /** Ex.: "cachorro", "gato", "papagaio". */
   especie: string;
   /** Onomatopeia do bicho, em maiúsculas, usada no card. Ex.: "AU-AU", "MIAU". */
   somDoAnimal: string;
-  /** Frase engraçada quando não é cachorro; vazia quando é. */
+  /** Frase engraçada quando o bicho é inusitado; vazia para cachorro e gato. */
   plotTwist: string;
   demo?: boolean;
 };

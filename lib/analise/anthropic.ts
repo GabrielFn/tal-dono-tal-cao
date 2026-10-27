@@ -29,8 +29,8 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     this.fetch = opcoes.fetch ?? globalThis.fetch;
   }
 
-  async analisar(pessoa: ImagemBase64, cachorro: ImagemBase64): Promise<Resultado> {
-    const resposta = await this.chamarApi(pessoa, cachorro);
+  async analisar(pessoa: ImagemBase64, pet: ImagemBase64): Promise<Resultado> {
+    const resposta = await this.chamarApi(pessoa, pet);
 
     // O modelo pode se recusar a analisar (ex.: conteúdo impróprio). Não é falha técnica:
     // o usuário recebe uma mensagem amigável para tentar com outras fotos.
@@ -47,7 +47,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     return normalizarResultado(bloco.input);
   }
 
-  private async chamarApi(pessoa: ImagemBase64, cachorro: ImagemBase64): Promise<RespostaApi> {
+  private async chamarApi(pessoa: ImagemBase64, pet: ImagemBase64): Promise<RespostaApi> {
     let resposta: Response;
     try {
       resposta = await this.fetch(URL_API, {
@@ -57,7 +57,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
           "anthropic-version": VERSAO_API,
           "content-type": "application/json",
         },
-        body: JSON.stringify(this.montarCorpo(pessoa, cachorro)),
+        body: JSON.stringify(this.montarCorpo(pessoa, pet)),
         signal: AbortSignal.timeout(this.opcoes.timeoutMs),
       });
     } catch (erro) {
@@ -71,7 +71,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     return resposta.json();
   }
 
-  private montarCorpo(pessoa: ImagemBase64, cachorro: ImagemBase64) {
+  private montarCorpo(pessoa: ImagemBase64, pet: ImagemBase64) {
     const imagem = (img: ImagemBase64) => ({
       type: "image",
       source: { type: "base64", media_type: img.tipo, data: img.dados },
@@ -89,8 +89,8 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
           content: [
             { type: "text", text: "Foto 1 (deveria ser a pessoa):" },
             imagem(pessoa),
-            { type: "text", text: "Foto 2 (deveria ser o cachorro):" },
-            imagem(cachorro),
+            { type: "text", text: "Foto 2 (deveria ser o pet):" },
+            imagem(pet),
             { type: "text", text: "Compare os dois e registre o resultado." },
           ],
         },

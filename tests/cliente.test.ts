@@ -13,13 +13,13 @@ const RESULTADO: ResultadoValido = {
   fraseCard: "f",
   racaProvavel: "r",
   categorias: [],
-  ehCachorro: true,
+  inusitado: false,
   especie: "cachorro",
   somDoAnimal: "AU-AU",
   plotTwist: "",
 };
 
-const comFotos: Estado = { ...ESTADO_INICIAL, fotos: { pessoa: "p", cachorro: "c" } };
+const comFotos: Estado = { ...ESTADO_INICIAL, fotos: { pessoa: "p", pet: "c" } };
 
 describe("reducer da tela", () => {
   it("só permite analisar com as duas fotos", () => {
@@ -34,7 +34,7 @@ describe("reducer da tela", () => {
     const comErros: Estado = {
       ...ESTADO_INICIAL,
       aviso: "erro geral",
-      errosFoto: { pessoa: "erro", cachorro: null },
+      errosFoto: { pessoa: "erro", pet: null },
     };
     const depois = reducer(comErros, { tipo: "foto_carregando", foto: "pessoa" });
     expect(depois.aviso).toBeNull();
@@ -45,14 +45,14 @@ describe("reducer da tela", () => {
   it("REGRESSÃO: o erro de uma foto não some quando a outra carrega", () => {
     let estado = reducer(ESTADO_INICIAL, { tipo: "foto_carregando", foto: "pessoa" });
     estado = reducer(estado, { tipo: "foto_falhou", foto: "pessoa", mensagem: "Não abriu" });
-    estado = reducer(estado, { tipo: "foto_carregando", foto: "cachorro" });
-    estado = reducer(estado, { tipo: "foto_escolhida", foto: "cachorro", dataUrl: "c" });
+    estado = reducer(estado, { tipo: "foto_carregando", foto: "pet" });
+    estado = reducer(estado, { tipo: "foto_escolhida", foto: "pet", dataUrl: "c" });
     expect(mensagensDeAviso(estado)).toEqual(["Selfie: Não abriu"]);
-    expect(estado.carregando).toEqual({ pessoa: false, cachorro: false });
+    expect(estado.carregando).toEqual({ pessoa: false, pet: false });
   });
 
   it("não deixa analisar enquanto uma foto ainda está abrindo", () => {
-    const abrindo = reducer(comFotos, { tipo: "foto_carregando", foto: "cachorro" });
+    const abrindo = reducer(comFotos, { tipo: "foto_carregando", foto: "pet" });
     expect(podeAnalisar(abrindo)).toBe(false);
   });
 
@@ -60,9 +60,9 @@ describe("reducer da tela", () => {
     const estado: Estado = {
       ...ESTADO_INICIAL,
       aviso: "Volta amanhã",
-      errosFoto: { pessoa: null, cachorro: "Não abriu" },
+      errosFoto: { pessoa: null, pet: "Não abriu" },
     };
-    expect(mensagensDeAviso(estado)).toEqual(["Foto do cachorro: Não abriu", "Volta amanhã"]);
+    expect(mensagensDeAviso(estado)).toEqual(["Foto do pet: Não abriu", "Volta amanhã"]);
   });
 
   it("segue o fluxo início → analisando → resultado", () => {
@@ -111,21 +111,22 @@ describe("solicitarAnalise", () => {
 });
 
 describe("textoDeCompartilhamento", () => {
-  it("inclui a nota e o site", () => {
-    const texto = textoDeCompartilhamento(
-      { nota: 87, ehCachorro: true, especie: "cachorro" },
-      "https://site.com",
-    );
+  const site = "https://site.com";
+  it("cachorro", () => {
+    const texto = textoDeCompartilhamento({ nota: 87, inusitado: false, especie: "cachorro" }, site);
     expect(texto).toContain("87%");
     expect(texto).toContain("meu cachorro");
-    expect(texto).toContain("https://site.com");
+    expect(texto).toContain(site);
   });
 
-  it("entrega o plot twist quando não é cachorro, sem errar o gênero", () => {
-    const texto = textoDeCompartilhamento(
-      { nota: 72, ehCachorro: false, especie: "calopsita" },
-      "https://site.com",
+  it("gato", () => {
+    expect(textoDeCompartilhamento({ nota: 80, inusitado: false, especie: "gato" }, site)).toContain(
+      "meu gato",
     );
+  });
+
+  it("bicho inusitado entrega o plot twist sem errar o gênero", () => {
+    const texto = textoDeCompartilhamento({ nota: 72, inusitado: true, especie: "calopsita" }, site);
     expect(texto).toContain("é calopsita");
     expect(texto).not.toContain("meu calopsita");
   });

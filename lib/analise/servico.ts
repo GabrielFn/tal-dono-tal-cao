@@ -32,10 +32,10 @@ export async function analisarFotos(
 ): Promise<RespostaServico> {
   if (typeof corpo !== "object" || corpo === null) return ERROS.corpoInvalido();
 
-  const { pessoa, cachorro } = corpo as Record<string, unknown>;
+  const { pessoa, pet } = corpo as Record<string, unknown>;
   const fotoPessoa = lerImagemDataUrl(pessoa);
-  const fotoCachorro = lerImagemDataUrl(cachorro);
-  if (!fotoPessoa || !fotoCachorro) return ERROS.imagemInvalida();
+  const fotoPet = lerImagemDataUrl(pet);
+  if (!fotoPessoa || !fotoPet) return ERROS.imagemInvalida();
 
   let reserva: Reserva | undefined;
   if (analisador.consomeCota) {
@@ -47,7 +47,7 @@ export async function analisarFotos(
   }
 
   try {
-    const resultado = await analisador.analisar(fotoPessoa, fotoCachorro);
+    const resultado = await analisador.analisar(fotoPessoa, fotoPet);
     return { status: 200, corpo: resultado };
   } catch (falha) {
     // A falha foi nossa (ou da IA), não do usuário: a tentativa não conta.

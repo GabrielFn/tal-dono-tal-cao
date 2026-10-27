@@ -21,7 +21,7 @@ function Oferta({ preco, onComprar }: { preco: string; onComprar: () => void }) 
       <ul className="premium-lista">
         <li>
           📜 <strong>Certificado Oficial de Sósia</strong> com o seu nome e o do pet, carimbado pelo Júri
-          Canino
+          Animal
         </li>
         <li>
           🎬 <strong>Vídeo animado</strong> do resultado, pronto para Reels e TikTok

@@ -5,7 +5,7 @@ import type { Bloqueio, Reserva } from "@/lib/limite";
 import type { Resultado } from "@/lib/tipos";
 import { dataUrlFalso } from "./auxiliares";
 
-const CORPO_VALIDO = { pessoa: dataUrlFalso(), cachorro: dataUrlFalso() };
+const CORPO_VALIDO = { pessoa: dataUrlFalso(), pet: dataUrlFalso() };
 
 const RESULTADO: Resultado = {
   valido: true,
@@ -15,8 +15,8 @@ const RESULTADO: Resultado = {
   fraseCard: "f",
   racaProvavel: "r",
   categorias: [],
-  ehCachorro: true,
-  especie: "cachorro",
+  inusitado: false,
+  especie: "pet",
   somDoAnimal: "AU-AU",
   plotTwist: "",
 };
@@ -53,7 +53,7 @@ describe("analisarFotos", () => {
     const lim = limitador(reservaOk().reserva);
     const ia = analisador(async () => RESULTADO);
     const r = await analisarFotos(
-      { pessoa: "x", cachorro: dataUrlFalso() },
+      { pessoa: "x", pet: dataUrlFalso() },
       "ip",
       deps({ limitador: lim, analisador: ia }),
     );
@@ -104,9 +104,9 @@ describe("analisarFotos", () => {
     expect(registrarErro).toHaveBeenCalledOnce();
   });
 
-  it("resultado inválido da IA (ex.: sem cachorro) conta como uso, pois a IA trabalhou", async () => {
+  it("resultado inválido da IA (ex.: sem pet) conta como uso, pois a IA trabalhou", async () => {
     const { reserva, devolver } = reservaOk();
-    const invalido: Resultado = { valido: false, motivo: "sem_animal", mensagem: "Cadê o cachorro?" };
+    const invalido: Resultado = { valido: false, motivo: "sem_animal", mensagem: "Cadê o pet?" };
     const r = await analisarFotos(
       CORPO_VALIDO,
       "ip",

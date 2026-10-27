@@ -9,12 +9,12 @@ export default function App({ precoPremiumCentavos }: { precoPremiumCentavos: nu
   const { estado, prontoParaAnalisar, escolherFoto, analisar, recomecar } = useAnalise();
   const { resultado, fotos } = estado;
 
-  if (estado.etapa === "resultado" && resultado && fotos.pessoa && fotos.cachorro) {
+  if (estado.etapa === "resultado" && resultado && fotos.pessoa && fotos.pet) {
     return (
       <TelaResultado
         resultado={resultado}
         fotoPessoa={fotos.pessoa}
-        fotoCachorro={fotos.cachorro}
+        fotoPet={fotos.pet}
         precoPremiumCentavos={precoPremiumCentavos}
         onRecomecar={recomecar}
       />

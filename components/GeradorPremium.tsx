@@ -59,7 +59,7 @@ export default function GeradorPremium({ resultado, fotoPessoa, fotoBicho, codig
         fotoPessoa,
         fotoBicho,
       );
-      definirCertificado(blob, "certificado-tal-dono-tal-cao.png");
+      definirCertificado(blob, "certificado-tal-dono-tal-pet.png");
     } catch {
       setErro("Não deu para gerar o certificado. Tenta de novo.");
     } finally {
@@ -78,7 +78,7 @@ export default function GeradorPremium({ resultado, fotoPessoa, fotoBicho, codig
         dominioDoSite,
         setProgressoVideo,
       );
-      definirVideo(blob, `tal-dono-tal-cao.${formato.extensao}`);
+      definirVideo(blob, `tal-dono-tal-pet.${formato.extensao}`);
     } catch (e) {
       setErro((e as Error).message || "Não deu para gravar o vídeo. Tenta de novo.");
     } finally {
@@ -111,7 +111,7 @@ export default function GeradorPremium({ resultado, fotoPessoa, fotoBicho, codig
             <input
               value={nomePet}
               maxLength={TAMANHO_MAX_NOME}
-              placeholder={resultado.ehCachorro ? "Ex.: Thor" : "Ex.: Mingau"}
+              placeholder={resultado.especie === "gato" ? "Ex.: Mingau" : "Ex.: Thor"}
               onChange={(e) => {
                 setNomePet(e.target.value);
                 limparCertificado();

@@ -53,13 +53,13 @@ export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar 
           onEscolher={(arquivo) => onEscolherFoto(arquivo, "pessoa")}
         />
         <SlotFoto
-          rotulo="Seu cachorro"
-          dica="Focinho bem visível (gato e papagaio também valem 👀)"
-          emoji="🐶"
+          rotulo="Seu pet"
+          dica="Cachorro, gato… ou algo mais inusitado 👀"
+          emoji="🐾"
           cor="var(--laranja)"
-          foto={estado.fotos.cachorro}
-          carregando={estado.carregando.cachorro}
-          onEscolher={(arquivo) => onEscolherFoto(arquivo, "cachorro")}
+          foto={estado.fotos.pet}
+          carregando={estado.carregando.pet}
+          onEscolher={(arquivo) => onEscolherFoto(arquivo, "pet")}
         />
       </div>
 

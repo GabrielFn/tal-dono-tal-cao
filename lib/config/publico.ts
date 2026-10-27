@@ -1,7 +1,7 @@
 // Configuração que pode ir para o navegador.
 // As variáveis NEXT_PUBLIC_* precisam ser lidas de forma literal para o Next.js embuti-las no build.
 
-const SITE_PADRAO = "https://tal-dono-tal-cao.vercel.app";
+const SITE_PADRAO = "https://tal-dono-tal-pet.vercel.app";
 const EMAIL_PADRAO = "contato@taldonotalcao.com.br";
 
 function comProtocolo(valor: string | undefined): string | undefined {
@@ -42,5 +42,5 @@ export const configPublica = {
   contatoEmail: process.env.NEXT_PUBLIC_CONTATO_EMAIL?.trim() || EMAIL_PADRAO,
 } as const;
 
-/** Domínio sem protocolo, ex.: "tal-dono-tal-cao.vercel.app". */
+/** Domínio sem protocolo, ex.: "tal-dono-tal-pet.vercel.app". */
 export const dominioDoSite = configPublica.siteUrl.replace(/^https?:\/\//, "");

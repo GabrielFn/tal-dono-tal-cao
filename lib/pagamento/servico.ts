@@ -60,7 +60,7 @@ export async function criarCobrancaPremium(
     const cobranca = await provedor.criarCobranca({
       valorCentavos: precoCentavos,
       email: email.trim().toLowerCase(),
-      descricao: "Tal Dono, Tal Cão — Pacote Premium",
+      descricao: "Tal Dono, Tal Pet — Pacote Premium",
       referencia: gerarReferencia(),
     });
     const publica: CobrancaPublica = {

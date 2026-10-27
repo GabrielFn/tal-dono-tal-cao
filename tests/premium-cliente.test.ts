@@ -116,7 +116,7 @@ describe("formatação", () => {
   });
   it("número do certificado é estável e tem 6 dígitos", () => {
     expect(numeroCertificado("ORD1")).toBe(numeroCertificado("ORD1"));
-    expect(numeroCertificado("ORD1")).toMatch(/^TDTC-\d{6}$/);
+    expect(numeroCertificado("ORD1")).toMatch(/^TDTP-\d{6}$/);
     expect(numeroCertificado("ORD1")).not.toBe(numeroCertificado("ORD2"));
   });
   it("data por extenso", () => {
@@ -126,23 +126,23 @@ describe("formatação", () => {
 
 describe("animação do vídeo", () => {
   it("começa vazio e termina com a cena completa", () => {
-    const inicio = animacaoNoTempo(0, true);
+    const inicio = animacaoNoTempo(0, false);
     expect(inicio.fotos).toBe(0);
     expect(inicio.nota).toBe(0);
-    const fim = animacaoNoTempo(DURACAO_VIDEO_S, false);
+    const fim = animacaoNoTempo(DURACAO_VIDEO_S, true);
     for (const valor of Object.values(fim)) expect(valor).toBeCloseTo(1, 5);
   });
 
-  it("selo do plot twist só aparece quando não é cachorro, e 'carimba' (começa grande)", () => {
-    expect(animacaoNoTempo(3.5, true).plotTwist).toBe(0);
-    expect(animacaoNoTempo(3.41, false).plotTwist).toBeGreaterThan(2);
-    expect(animacaoNoTempo(5, false).plotTwist).toBeCloseTo(1, 5);
+  it("selo do plot twist só aparece para bicho inusitado, e 'carimba' (começa grande)", () => {
+    expect(animacaoNoTempo(3.5, false).plotTwist).toBe(0);
+    expect(animacaoNoTempo(3.41, true).plotTwist).toBeGreaterThan(2);
+    expect(animacaoNoTempo(5, true).plotTwist).toBeCloseTo(1, 5);
   });
 
   it("a nota sobe sem passar do valor final", () => {
     let anterior = 0;
     for (let t = 1.4; t <= 3.3; t += 0.1) {
-      const atual = animacaoNoTempo(t, true).nota;
+      const atual = animacaoNoTempo(t, false).nota;
       expect(atual).toBeGreaterThanOrEqual(anterior);
       expect(atual).toBeLessThanOrEqual(1);
       anterior = atual;
@@ -153,16 +153,14 @@ describe("animação do vídeo", () => {
 describe("resultado salvo na sessão", () => {
   const ok = {
     resultado: { valido: true, nota: 80 },
-    fotos: { pessoa: "data:image/jpeg;base64,AA", cachorro: "data:image/jpeg;base64,BB" },
+    fotos: { pessoa: "data:image/jpeg;base64,AA", pet: "data:image/jpeg;base64,BB" },
   };
   it("aceita um resultado completo", () => {
     expect(resultadoSalvoValido(ok)).toBe(true);
   });
   it("recusa lixo ou dados adulterados", () => {
     expect(resultadoSalvoValido(null)).toBe(false);
-    expect(resultadoSalvoValido({ ...ok, fotos: { pessoa: "javascript:alert(1)", cachorro: "x" } })).toBe(
-      false,
-    );
+    expect(resultadoSalvoValido({ ...ok, fotos: { pessoa: "javascript:alert(1)", pet: "x" } })).toBe(false);
     expect(resultadoSalvoValido({ ...ok, resultado: { valido: false } })).toBe(false);
   });
 });

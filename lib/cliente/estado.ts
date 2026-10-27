@@ -2,7 +2,7 @@
 import type { ResultadoValido } from "@/lib/tipos";
 
 export type Etapa = "inicio" | "analisando" | "resultado";
-export type TipoFoto = "pessoa" | "cachorro";
+export type TipoFoto = "pessoa" | "pet";
 
 type PorFoto<T> = Record<TipoFoto, T>;
 
@@ -25,11 +25,11 @@ export type Acao =
   | { tipo: "analise_iniciada" }
   | { tipo: "analise_concluida"; resultado: ResultadoValido }
   | { tipo: "analise_falhou"; mensagem: string }
-  | { tipo: "restaurar"; resultado: ResultadoValido; fotos: { pessoa: string; cachorro: string } }
+  | { tipo: "restaurar"; resultado: ResultadoValido; fotos: { pessoa: string; pet: string } }
   | { tipo: "recomecar" };
 
 /** O que fica salvo na sessão da aba para o resultado sobreviver a um recarregamento. */
-export type ResultadoSalvo = { resultado: ResultadoValido; fotos: { pessoa: string; cachorro: string } };
+export type ResultadoSalvo = { resultado: ResultadoValido; fotos: { pessoa: string; pet: string } };
 
 export function resultadoSalvoValido(valor: unknown): valor is ResultadoSalvo {
   const v = valor as ResultadoSalvo | null;
@@ -39,16 +39,16 @@ export function resultadoSalvoValido(valor: unknown): valor is ResultadoSalvo {
     typeof v.resultado.nota === "number" &&
     typeof v.fotos?.pessoa === "string" &&
     v.fotos.pessoa.startsWith("data:image/") &&
-    typeof v.fotos?.cachorro === "string" &&
-    v.fotos.cachorro.startsWith("data:image/"),
+    typeof v.fotos?.pet === "string" &&
+    v.fotos.pet.startsWith("data:image/"),
   );
 }
 
 export const ESTADO_INICIAL: Estado = {
   etapa: "inicio",
-  fotos: { pessoa: null, cachorro: null },
-  carregando: { pessoa: false, cachorro: false },
-  errosFoto: { pessoa: null, cachorro: null },
+  fotos: { pessoa: null, pet: null },
+  carregando: { pessoa: false, pet: false },
+  errosFoto: { pessoa: null, pet: null },
   aviso: null,
   resultado: null,
 };
@@ -56,16 +56,13 @@ export const ESTADO_INICIAL: Estado = {
 export function podeAnalisar(estado: Estado): boolean {
   const { fotos, carregando } = estado;
   return (
-    estado.etapa === "inicio" &&
-    Boolean(fotos.pessoa && fotos.cachorro) &&
-    !carregando.pessoa &&
-    !carregando.cachorro
+    estado.etapa === "inicio" && Boolean(fotos.pessoa && fotos.pet) && !carregando.pessoa && !carregando.pet
   );
 }
 
 /** Mensagens a exibir: erros das fotos (com o nome do slot) e o erro geral. */
 export function mensagensDeAviso(estado: Estado): string[] {
-  const rotulos: PorFoto<string> = { pessoa: "Selfie", cachorro: "Foto do cachorro" };
+  const rotulos: PorFoto<string> = { pessoa: "Selfie", pet: "Foto do pet" };
   const daFoto = (Object.keys(rotulos) as TipoFoto[])
     .filter((foto) => estado.errosFoto[foto])
     .map((foto) => `${rotulos[foto]}: ${estado.errosFoto[foto]}`);

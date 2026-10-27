@@ -8,7 +8,7 @@ const MENSAGEM_CONEXAO = "Sem conexão ou o servidor demorou demais. Tenta de no
 
 export async function solicitarAnalise(
   pessoa: string,
-  cachorro: string,
+  pet: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<RespostaAnalise> {
   let resposta: Response;
@@ -17,7 +17,7 @@ export async function solicitarAnalise(
     resposta = await fetchFn("/api/analisar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pessoa, cachorro }),
+      body: JSON.stringify({ pessoa, pet }),
     });
     dados = await resposta.json();
   } catch {

@@ -10,7 +10,7 @@ import type { ResultadoValido } from "@/lib/tipos";
 type Props = {
   resultado: ResultadoValido;
   fotoPessoa: string;
-  fotoCachorro: string;
+  fotoPet: string;
   precoPremiumCentavos: number;
   onRecomecar: () => void;
 };
@@ -34,12 +34,8 @@ function Categorias({ categorias }: Pick<ResultadoValido, "categorias">) {
   );
 }
 
-function AreaDoCard({
-  resultado,
-  fotoPessoa,
-  fotoCachorro,
-}: Pick<Props, "resultado" | "fotoPessoa" | "fotoCachorro">) {
-  const { card, erro } = useCard(resultado, fotoPessoa, fotoCachorro);
+function AreaDoCard({ resultado, fotoPessoa, fotoPet }: Pick<Props, "resultado" | "fotoPessoa" | "fotoPet">) {
+  const { card, erro } = useCard(resultado, fotoPessoa, fotoPet);
 
   const compartilhar = () =>
     card && compartilharImagem(card.blob, textoDeCompartilhamento(resultado, configPublica.siteUrl));
@@ -70,7 +66,7 @@ function AreaDoCard({
 export default function TelaResultado({
   resultado,
   fotoPessoa,
-  fotoCachorro,
+  fotoPet,
   precoPremiumCentavos,
   onRecomecar,
 }: Props) {
@@ -85,14 +81,10 @@ export default function TelaResultado({
           ≈
         </span>
         {/* eslint-disable-next-line @next/next/no-img-element -- data URL local */}
-        <img
-          src={fotoCachorro}
-          alt={resultado.ehCachorro ? "Seu cachorro" : `Seu pet (${resultado.especie})`}
-          className="dupla-foto"
-        />
+        <img src={fotoPet} alt={`Seu pet (${resultado.especie})`} className="dupla-foto" />
       </div>
 
-      {!resultado.ehCachorro && (
+      {resultado.inusitado && (
         <p className="plot-twist" role="status">
           <span className="plot-twist-selo">Plot twist!</span>
           {resultado.plotTwist}
@@ -107,12 +99,12 @@ export default function TelaResultado({
       </p>
 
       <Categorias categorias={resultado.categorias} />
-      <AreaDoCard resultado={resultado} fotoPessoa={fotoPessoa} fotoCachorro={fotoCachorro} />
+      <AreaDoCard resultado={resultado} fotoPessoa={fotoPessoa} fotoPet={fotoPet} />
 
       <PainelPremium
         resultado={resultado}
         fotoPessoa={fotoPessoa}
-        fotoBicho={fotoCachorro}
+        fotoBicho={fotoPet}
         precoCentavos={precoPremiumCentavos}
       />
 

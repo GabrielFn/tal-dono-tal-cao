@@ -1,4 +1,4 @@
-# Tal Dono, Tal Cão 🐾
+# Tal Dono, Tal Pet 🐾
 
 Web app que mede, com IA, o quanto uma pessoa se parece com o próprio cachorro e gera um card pronto para Stories e TikTok.
 

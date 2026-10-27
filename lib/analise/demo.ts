@@ -2,7 +2,7 @@
 import type { ResultadoValido } from "@/lib/tipos";
 import type { AnalisadorDeFotos } from "./tipos";
 
-const CACHORRO = { ehCachorro: true, especie: "cachorro", somDoAnimal: "AU-AU", plotTwist: "" } as const;
+const CACHORRO = { inusitado: false, especie: "cachorro", somDoAnimal: "AU-AU", plotTwist: "" } as const;
 
 const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
   {
@@ -79,15 +79,15 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
   },
   {
     nota: 72,
-    titulo: "Gato infiltrado detectado",
+    titulo: "Realeza felina reconhecida",
     veredito:
       "Os dois encaram a câmera com a mesma cara de quem foi interrompido no meio de algo muito importante. A pose de superioridade é idêntica.",
-    fraseCard: "Não é cachorro, mas a arrogância é de família.",
+    fraseCard: "A arrogância é de família.",
     racaProvavel: "Siamês de nariz empinado",
-    ehCachorro: false,
+    inusitado: false,
     especie: "gato",
     somDoAnimal: "MIAU",
-    plotTwist: "Isso é um gato. Ele sabe que o app é de cachorro e simplesmente não se importa.",
+    plotTwist: "",
     categorias: [
       { nome: "Olhar", nota: 88, comentario: "O mesmo olhar de julgamento silencioso. Assustador." },
       {
@@ -102,6 +102,30 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
         comentario: "Queixo levantado nos dois. Realeza reconhece realeza.",
       },
       { nome: "Vibe", nota: 70, comentario: "Dupla que ignora mensagens no grupo da família." },
+    ],
+  },
+  {
+    nota: 64,
+    titulo: "Calopsita de alta patente",
+    veredito:
+      "O topete dela e o seu cabelo de manhã são tecnicamente a mesma obra de arte. A cabeça inclinada de 'oi?' também confere.",
+    fraseCard: "Mesmo topete, mesma cara de 'oi?'.",
+    racaProvavel: "Calopsita de alta patente",
+    inusitado: true,
+    especie: "calopsita",
+    somDoAnimal: "PIU-PIU",
+    plotTwist:
+      "O júri esperava um cachorro ou um gato. Recebeu uma calopsita, e ela claramente manda na casa.",
+    categorias: [
+      { nome: "Olhar", nota: 58, comentario: "Os dois olham de lado, como quem desconfia do fotógrafo." },
+      {
+        nome: "Cabelo x pelo",
+        nota: 81,
+        comentario: "Topete armado nos dois. Ninguém usa pente nessa casa.",
+      },
+      { nome: "Expressão", nota: 55, comentario: "Bico versus sorriso: empate técnico na simpatia." },
+      { nome: "Pose e postura", nota: 66, comentario: "Cabeça inclinada sincronizada. Ensaiaram?" },
+      { nome: "Vibe", nota: 60, comentario: "Dupla que acorda cantando e acorda o prédio junto." },
     ],
   },
 ];

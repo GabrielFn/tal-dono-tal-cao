@@ -9,7 +9,7 @@ const MOTIVOS_LEGADOS: Record<string, MotivoInvalido> = { sem_cachorro: "sem_ani
 
 export const MENSAGENS_PADRAO: Record<MotivoInvalido, string> = {
   sem_pessoa: "Não encontramos um rosto humano. Manda uma selfie com o rosto bem visível!",
-  sem_animal: "Cadê o bicho? Precisamos de uma foto do seu cachorro (ou gato, ou papagaio…).",
+  sem_animal: "Cadê o pet? Precisamos de uma foto do seu bicho (cachorro, gato, o que for).",
   foto_ruim: "A foto ficou escura ou borrada. Tenta outra com mais luz e o rosto de frente.",
   outro: "Não conseguimos analisar essas fotos. Tenta com outras.",
 };
@@ -42,7 +42,27 @@ function lerMotivo(valor: unknown): MotivoInvalido {
   return MOTIVOS_LEGADOS[String(valor)] ?? "outro";
 }
 
-const SOM_DO_CACHORRO = "AU-AU";
+/** Bichos "de casa": não ganham plot twist e têm som fixo. Chave = espécie normalizada. */
+const BICHOS_COMUNS: Record<string, { especie: string; som: string }> = {
+  cachorro: { especie: "cachorro", som: "AU-AU" },
+  cachorra: { especie: "cachorro", som: "AU-AU" },
+  cao: { especie: "cachorro", som: "AU-AU" },
+  cadela: { especie: "cachorro", som: "AU-AU" },
+  dog: { especie: "cachorro", som: "AU-AU" },
+  gato: { especie: "gato", som: "MIAU" },
+  gata: { especie: "gato", som: "MIAU" },
+  gatinho: { especie: "gato", som: "MIAU" },
+  felino: { especie: "gato", som: "MIAU" },
+};
+
+/** "Cão" → "cao", " GATA " → "gata". */
+function chaveDeEspecie(especie: string): string {
+  return especie
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim()
+    .toLowerCase();
+}
 
 /** Onomatopeia curta e segura para desenhar no card: maiúsculas, letras, hífen, ponto e espaço. */
 function lerSom(valor: unknown): string {
@@ -60,23 +80,27 @@ function semPrefixoPlotTwist(texto: string): string {
   return semPrefixo.charAt(0).toLocaleUpperCase("pt-BR") + semPrefixo.slice(1);
 }
 
-type DadosDoAnimal = Pick<ResultadoValido, "ehCachorro" | "especie" | "somDoAnimal" | "plotTwist">;
+type DadosDoAnimal = Pick<ResultadoValido, "inusitado" | "especie" | "somDoAnimal" | "plotTwist">;
 
+/**
+ * Cachorro e gato são o normal do app. Qualquer outro bicho é "inusitado" e ganha plot twist.
+ * A decisão é nossa (pela espécie), não da IA, para ficar sempre consistente.
+ */
 function lerAnimal(bruto: Record<string, unknown>): DadosDoAnimal {
-  // Sem a informação (respostas antigas), assume cachorro: é o caso mais comum.
-  const ehCachorro = bruto.ehCachorro !== false;
-  if (ehCachorro) {
-    return { ehCachorro, especie: "cachorro", somDoAnimal: SOM_DO_CACHORRO, plotTwist: "" };
+  // Respostas antigas (sem espécie) eram sempre de cachorro.
+  const especieBruta =
+    textoLimpo(bruto.especie, TAMANHO_MAXIMO.especie).toLocaleLowerCase("pt-BR") || "cachorro";
+  const comum = BICHOS_COMUNS[chaveDeEspecie(especieBruta)];
+  if (comum) {
+    return { inusitado: false, especie: comum.especie, somDoAnimal: comum.som, plotTwist: "" };
   }
-  const especie =
-    textoLimpo(bruto.especie, TAMANHO_MAXIMO.especie).toLocaleLowerCase("pt-BR") || "bicho misterioso";
   return {
-    ehCachorro,
-    especie,
+    inusitado: true,
+    especie: especieBruta,
     somDoAnimal: lerSom(bruto.somDoAnimal) || "???",
     plotTwist:
       semPrefixoPlotTwist(textoLimpo(bruto.plotTwist, TAMANHO_MAXIMO.plotTwist)) ||
-      `Isso não é um cachorro! Espécie detectada: ${especie}. Mas a gente avalia mesmo assim.`,
+      `Espécie detectada: ${especieBruta}. O júri não estava preparado, mas avaliou mesmo assim.`,
   };
 }
 

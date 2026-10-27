@@ -3,7 +3,7 @@ import Link from "next/link";
 import Rodape from "@/components/Rodape";
 import { configPublica } from "@/lib/config/publico";
 
-export const metadata: Metadata = { title: "Política de Privacidade — Tal Dono, Tal Cão" };
+export const metadata: Metadata = { title: "Política de Privacidade — Tal Dono, Tal Pet" };
 
 const EMAIL = configPublica.contatoEmail;
 
@@ -26,7 +26,7 @@ export default function Privacidade() {
         <h2>Quais dados tratamos</h2>
         <ul>
           <li>
-            <strong>Fotos enviadas:</strong> a selfie e a foto do cachorro. Elas ficam apenas na memória do
+            <strong>Fotos enviadas:</strong> a selfie e a foto do pet. Elas ficam apenas na memória do
             servidor durante a análise, que leva poucos segundos, e não são gravadas em disco nem em banco de
             dados.
           </li>
@@ -42,7 +42,7 @@ export default function Privacidade() {
 
         <h2>Para que usamos</h2>
         <p>
-          Exclusivamente para gerar a comparação divertida entre você e seu cachorro, montar o card de
+          Exclusivamente para gerar a comparação divertida entre você e seu pet, montar o card de
           compartilhamento e manter o serviço funcionando com segurança. Não usamos as fotos para
           reconhecimento facial, identificação de pessoas, publicidade ou treinamento de modelos próprios.
         </p>

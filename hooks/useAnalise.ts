@@ -33,14 +33,14 @@ export function useAnalise() {
   }, []);
 
   const analisar = useCallback(async () => {
-    const { pessoa, cachorro } = estado.fotos;
-    if (!podeAnalisar(estado) || !pessoa || !cachorro) return;
+    const { pessoa, pet } = estado.fotos;
+    if (!podeAnalisar(estado) || !pessoa || !pet) return;
 
     despachar({ tipo: "analise_iniciada" });
-    const resposta = await solicitarAnalise(pessoa, cachorro);
+    const resposta = await solicitarAnalise(pessoa, pet);
     if (resposta.ok) {
       despachar({ tipo: "analise_concluida", resultado: resposta.resultado });
-      const salvo: ResultadoSalvo = { resultado: resposta.resultado, fotos: { pessoa, cachorro } };
+      const salvo: ResultadoSalvo = { resultado: resposta.resultado, fotos: { pessoa, pet } };
       salvarSessao(CHAVES_SESSAO.resultado, salvo);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {

@@ -22,7 +22,7 @@ const CENTRO_X = LARGURA_CENA / 2;
 /** Posições de cada elemento. Mude aqui para reorganizar o card (e o vídeo). */
 const LAYOUT = {
   marca: { y: 150, tamanho: 54 },
-  fotos: { y: 560, raio: 220, xPessoa: 300, xCachorro: 780, borda: 10, sombra: 14 },
+  fotos: { y: 560, raio: 220, xPessoa: 300, xPet: 780, borda: 10, sombra: 14 },
   etiquetas: { y: 840, tamanho: 40, altura: 64 },
   selo: { raio: 70, sombra: 6 },
   nota: { y: 1120, tamanho: 300, contorno: 26, sombra: 10 },
@@ -36,7 +36,7 @@ const LAYOUT = {
 
 export type DadosCena = Pick<
   ResultadoValido,
-  "nota" | "titulo" | "fraseCard" | "somDoAnimal" | "ehCachorro" | "especie"
+  "nota" | "titulo" | "fraseCard" | "somDoAnimal" | "inusitado" | "especie"
 >;
 
 export type ImagensCena = { pessoa: HTMLImageElement; bicho: HTMLImageElement };
@@ -98,7 +98,7 @@ function desenharFundo(ctx: Ctx) {
 function desenharMarca(ctx: Ctx) {
   ctx.fillStyle = COR.tinta;
   ctx.font = fonte(900, LAYOUT.marca.tamanho);
-  ctx.fillText("TAL DONO, TAL CÃO", CENTRO_X, LAYOUT.marca.y);
+  ctx.fillText("TAL DONO, TAL PET", CENTRO_X, LAYOUT.marca.y);
 }
 
 function desenharFoto(ctx: Ctx, img: HTMLImageElement, cx: number) {
@@ -228,12 +228,12 @@ export function desenharCena(
       ctx.translate(-deslocamento, 0);
       desenharFoto(ctx, imagens.pessoa, fotos.xPessoa);
       ctx.translate(deslocamento * 2, 0);
-      desenharFoto(ctx, imagens.bicho, fotos.xCachorro);
+      desenharFoto(ctx, imagens.bicho, fotos.xPet);
     });
   }
   comEfeito(ctx, a.etiquetas, CENTRO_X, etiquetas.y, 1, () => {
     desenharEtiqueta(ctx, "EU", fotos.xPessoa, COR.verde);
-    desenharEtiqueta(ctx, dados.somDoAnimal, fotos.xCachorro, COR.laranja);
+    desenharEtiqueta(ctx, dados.somDoAnimal, fotos.xPet, COR.laranja);
   });
   comEfeito(ctx, Math.min(1, a.selo), CENTRO_X, fotos.y, a.selo, () => desenharSelo(ctx));
 
@@ -252,7 +252,7 @@ export function desenharCena(
   comEfeito(ctx, a.rodape, CENTRO_X, LAYOUT.rodape.y, 1, () => desenharRodape(ctx, dominio));
 
   // O selo "carimba" por cima de tudo, por isso vem por último.
-  if (!dados.ehCachorro) {
+  if (dados.inusitado) {
     comEfeito(ctx, Math.min(1, a.plotTwist), CENTRO_X, LAYOUT.plotTwist.y, a.plotTwist, () =>
       desenharSeloPlotTwist(ctx, dados.especie),
     );
@@ -267,10 +267,10 @@ export async function carregarImagensCena(fotoPessoa: string, fotoBicho: string)
 export async function gerarCard(
   resultado: DadosCena,
   fotoPessoa: string,
-  fotoCachorro: string,
+  fotoPet: string,
   dominio: string,
 ): Promise<Blob> {
-  const imagens = await carregarImagensCena(fotoPessoa, fotoCachorro);
+  const imagens = await carregarImagensCena(fotoPessoa, fotoPet);
   const { canvas, ctx } = criarCanvas(LARGURA_CENA, ALTURA_CENA);
   desenharCena(ctx, resultado, imagens, dominio);
   return canvasParaBlob(canvas);

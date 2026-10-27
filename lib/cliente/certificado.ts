@@ -16,7 +16,7 @@ export const LARGURA_CERTIFICADO = 1754;
 export const ALTURA_CERTIFICADO = 1240; // proporção A4 deitada
 const CX = LARGURA_CERTIFICADO / 2;
 
-export type DadosCertificado = Pick<ResultadoValido, "nota" | "titulo" | "ehCachorro" | "especie"> & {
+export type DadosCertificado = Pick<ResultadoValido, "nota" | "titulo" | "inusitado" | "especie"> & {
   nomeTutor: string;
   nomePet: string;
   /** Usado para gerar o número do certificado. */
@@ -27,14 +27,14 @@ export type DadosCertificado = Pick<ResultadoValido, "nota" | "titulo" | "ehCach
 export const NOME_TUTOR_PADRAO = "Tutor(a) de respeito";
 export const NOME_PET_PADRAO = "Pet de respeito";
 
-/** Número curto e estável a partir do código da compra. Ex.: "TDTC-048213". */
+/** Número curto e estável a partir do código da compra. Ex.: "TDTP-048213". */
 export function numeroCertificado(codigo: string): string {
   let hash = 2166136261;
   for (const letra of codigo) {
     hash ^= letra.charCodeAt(0);
     hash = Math.imul(hash, 16777619);
   }
-  return `TDTC-${String((hash >>> 0) % 1_000_000).padStart(6, "0")}`;
+  return `TDTP-${String((hash >>> 0) % 1_000_000).padStart(6, "0")}`;
 }
 
 export function dataPorExtenso(data: Date): string {
@@ -90,7 +90,7 @@ function desenharCabecalho(ctx: Ctx) {
   ctx.fillText("CERTIFICADO OFICIAL DE SÓSIA", CX, 175);
   ctx.font = fonte(700, 30);
   ctx.fillStyle = COR.tintaSuave;
-  ctx.fillText("Emitido pelo Júri Canino do Tal Dono, Tal Cão", CX, 245);
+  ctx.fillText("Emitido pelo Júri Animal do Tal Dono, Tal Pet", CX, 245);
 }
 
 function desenharFoto(ctx: Ctx, img: HTMLImageElement, cx: number, cy: number) {
@@ -136,7 +136,7 @@ function desenharCorpo(ctx: Ctx, d: DadosCertificado) {
   ajustarFonte(ctx, `— ${d.titulo} —`, { peso: 700, max: 40, min: 26, largura: 1100, estilo: "italic" });
   ctx.fillText(`— ${d.titulo} —`, CX, 850);
 
-  if (!d.ehCachorro) {
+  if (d.inusitado) {
     ctx.fillStyle = COR.tintaSuave;
     ajustarFonte(ctx, `(com ressalvas: o júri constatou que se trata de ${d.especie})`, {
       peso: 600,
@@ -173,7 +173,7 @@ function desenharSelo(ctx: Ctx, x: number, y: number) {
   ctx.font = fonte(900, 27);
   ctx.fillText("APROVADO", 0, -22);
   ctx.font = fonte(700, 18);
-  ctx.fillText("PELO JÚRI CANINO", 0, 10);
+  ctx.fillText("PELO JÚRI ANIMAL", 0, 10);
   desenharPatinha(ctx, 0, 52, 0.8, COR.tinta);
   ctx.restore();
 }
@@ -194,11 +194,11 @@ function desenharRodape(ctx: Ctx, d: DadosCertificado) {
   const xAss = LARGURA_CERTIFICADO - 400;
   ctx.fillStyle = COR.tinta;
   ctx.font = fonte(700, 52, "italic");
-  ctx.fillText("Dr. Au-Au", xAss, y - 30);
+  ctx.fillText("Dr. Au-Miau", xAss, y - 30);
   ctx.fillRect(xAss - 190, y + 2, 380, 3);
   ctx.font = fonte(700, 24);
-  ctx.fillText("Juiz-Chefe do Júri Canino", xAss, y + 32);
-  if (!d.ehCachorro) {
+  ctx.fillText("Juiz-Chefe do Júri Animal", xAss, y + 32);
+  if (d.inusitado) {
     ctx.font = fonte(600, 20);
     ctx.fillStyle = COR.tintaSuave;
     ctx.fillText("(assinou sob protesto)", xAss, y + 62);

@@ -3,8 +3,8 @@
 // Serve para não perder o resultado quando a pessoa vai ao app do banco pagar o Pix e volta.
 
 export const CHAVES_SESSAO = {
-  resultado: "tdtc:resultado:v1",
-  premium: "tdtc:premium:v1",
+  resultado: "tdtp:resultado:v2",
+  premium: "tdtp:premium:v2",
 } as const;
 
 export function lerSessao<T>(chave: string): T | null {

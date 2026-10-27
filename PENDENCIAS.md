@@ -3,7 +3,7 @@
 ## Para publicar (bloqueia o lançamento)
 
 1. **Chave da API da Anthropic** — criar em console.anthropic.com, colocar créditos e um limite de gasto mensal. A chave vai direto na Vercel, não precisa me mandar.
-2. **Nome e domínio** — usei "Tal Dono, Tal Cão" e `taldonotalcao.com.br` como provisórios. Confirmar o nome e verificar se o domínio está livre no Registro.br.
+2. **Nome e domínio** — usei "Tal Dono, Tal Pet" e `taldonotalcao.com.br` como provisórios. Confirmar o nome e verificar se o domínio está livre no Registro.br.
 3. **Conta no GitHub e na Vercel** — para subir o código e publicar (passo a passo no README).
 4. **E-mail de contato** — exigido pela LGPD na política de privacidade.
 

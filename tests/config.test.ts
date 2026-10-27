@@ -3,7 +3,7 @@ import { resolverSiteUrl } from "@/lib/config/publico";
 
 describe("resolverSiteUrl", () => {
   it("usa o endereço da Vercel por padrão", () => {
-    expect(resolverSiteUrl(undefined, undefined)).toBe("https://tal-dono-tal-cao.vercel.app");
+    expect(resolverSiteUrl(undefined, undefined)).toBe("https://tal-dono-tal-pet.vercel.app");
   });
 
   it("usa o domínio de produção informado pela Vercel (que vem sem https)", () => {
@@ -17,7 +17,7 @@ describe("resolverSiteUrl", () => {
   });
 
   it("ignora valores vazios ou inválidos", () => {
-    expect(resolverSiteUrl("   ", undefined)).toBe("https://tal-dono-tal-cao.vercel.app");
-    expect(resolverSiteUrl("https://", undefined)).toBe("https://tal-dono-tal-cao.vercel.app");
+    expect(resolverSiteUrl("   ", undefined)).toBe("https://tal-dono-tal-pet.vercel.app");
+    expect(resolverSiteUrl("https://", undefined)).toBe("https://tal-dono-tal-pet.vercel.app");
   });
 });

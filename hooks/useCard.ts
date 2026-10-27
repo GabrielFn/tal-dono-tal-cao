@@ -11,7 +11,7 @@ export type Card = { blob: Blob; url: string };
 export function useCard(
   resultado: ResultadoValido | null,
   fotoPessoa: string | null,
-  fotoCachorro: string | null,
+  fotoPet: string | null,
 ) {
   const [card, setCard] = useState<Card | null>(null);
   const [erro, setErro] = useState(false);
@@ -19,12 +19,12 @@ export function useCard(
   useEffect(() => {
     setCard(null);
     setErro(false);
-    if (!resultado || !fotoPessoa || !fotoCachorro) return;
+    if (!resultado || !fotoPessoa || !fotoPet) return;
 
     let cancelado = false;
     let url: string | null = null;
 
-    gerarCard(resultado, fotoPessoa, fotoCachorro, dominioDoSite)
+    gerarCard(resultado, fotoPessoa, fotoPet, dominioDoSite)
       .then((blob) => {
         if (cancelado) return;
         url = URL.createObjectURL(blob);
@@ -36,7 +36,7 @@ export function useCard(
       cancelado = true;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [resultado, fotoPessoa, fotoCachorro]);
+  }, [resultado, fotoPessoa, fotoPet]);
 
   return { card, erro };
 }

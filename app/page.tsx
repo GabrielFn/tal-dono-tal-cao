@@ -8,9 +8,9 @@ export default function Home() {
   return (
     <main className="pagina">
       <header className="cabecalho">
-        <p className="marca">Tal Dono, Tal Cão 🐾</p>
+        <p className="marca">Tal Dono, Tal Pet 🐾</p>
         <h1>
-          O quanto você se parece com o <span className="destaque">seu cachorro?</span>
+          O quanto você se parece com o <span className="destaque">seu pet?</span>
         </h1>
         <p className="subtitulo">Duas fotos, uma IA e a verdade que todo mundo já desconfiava.</p>
       </header>
@@ -21,7 +21,8 @@ export default function Home() {
         <h2 id="como">Como funciona</h2>
         <ol>
           <li>
-            <strong>Mande as fotos.</strong> Uma selfie sua e uma do seu cachorro.
+            <strong>Mande as fotos.</strong> Uma selfie sua e uma do seu pet: cachorro, gato ou o que você
+            tiver aí.
           </li>
           <li>
             <strong>A IA compara.</strong> Olhar, cabelo x pelo, expressão, pose e vibe.
@@ -31,7 +32,7 @@ export default function Home() {
           </li>
         </ol>
         <p className="ciencia">
-          Tem até ciência: estudos de psicologia mostram que muita gente escolhe cachorros parecidos consigo,
+          Tem até ciência: estudos de psicologia mostram que muita gente escolhe pets parecidos consigo,
           principalmente no olhar.
         </p>
       </section>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Rodape from "@/components/Rodape";
 import { configPublica } from "@/lib/config/publico";
 
-export const metadata: Metadata = { title: "Termos de Uso — Tal Dono, Tal Cão" };
+export const metadata: Metadata = { title: "Termos de Uso — Tal Dono, Tal Pet" };
 
 const EMAIL = configPublica.contatoEmail;
 
@@ -19,14 +19,14 @@ export default function Termos() {
 
         <h2>1. O que é</h2>
         <p>
-          O Tal Dono, Tal Cão é um site de entretenimento. Uma inteligência artificial compara uma foto sua
-          com uma foto do seu cachorro e gera uma nota e comentários bem-humorados.
+          O Tal Dono, Tal Pet é um site de entretenimento. Uma inteligência artificial compara uma foto sua
+          com uma foto do seu pet e gera uma nota e comentários bem-humorados.
         </p>
 
         <h2>2. É só diversão</h2>
         <p>
           Os resultados não têm valor científico, veterinário ou de qualquer outro tipo. A IA pode errar,
-          inclusive na raça do cachorro. Não use o resultado para decisões sérias.
+          inclusive na raça do pet. Não use o resultado para decisões sérias.
         </p>
 
         <h2>3. O que você pode enviar</h2>

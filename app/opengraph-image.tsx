@@ -1,7 +1,7 @@
 // Imagem de preview que aparece quando o link é enviado no WhatsApp, Instagram, etc.
 import { ImageResponse } from "next/og";
 
-export const alt = "Tal Dono, Tal Cão — o quanto você se parece com seu cachorro?";
+export const alt = "Tal Dono, Tal Pet — o quanto você se parece com seu pet?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -33,10 +33,10 @@ export default function OpengraphImage() {
           marginBottom: 36,
         }}
       >
-        TAL DONO, TAL CÃO
+        TAL DONO, TAL PET
       </div>
       <div style={{ display: "flex", fontSize: 76, fontWeight: 900, textAlign: "center", lineHeight: 1.05 }}>
-        O quanto você se parece com o seu cachorro?
+        O quanto você se parece com o seu pet?
       </div>
       <div
         style={{

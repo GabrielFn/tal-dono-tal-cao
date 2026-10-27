@@ -2,7 +2,7 @@ import type { ResultadoValido } from "@/lib/tipos";
 
 // Compartilhamento do card: usa o menu nativo do celular quando existe, senão baixa o arquivo.
 
-export const NOME_ARQUIVO_CARD = "tal-dono-tal-cao.png";
+export const NOME_ARQUIVO_CARD = "tal-dono-tal-pet.png";
 
 export function baixarArquivo(url: string, nome = NOME_ARQUIVO_CARD): void {
   const link = document.createElement("a");
@@ -12,13 +12,15 @@ export function baixarArquivo(url: string, nome = NOME_ARQUIVO_CARD): void {
 }
 
 export function textoDeCompartilhamento(
-  resultado: Pick<ResultadoValido, "nota" | "ehCachorro" | "especie">,
+  resultado: Pick<ResultadoValido, "nota" | "inusitado" | "especie">,
   siteUrl: string,
 ): string {
-  // "pet" evita errar o gênero ("meu calopsita").
-  const bicho = resultado.ehCachorro
-    ? "meu cachorro 🐶"
-    : `meu pet 🐾 (detalhe: é ${resultado.especie}, num app de cachorro 🙃)`;
+  // Para bicho inusitado, "pet" evita errar o gênero ("meu calopsita").
+  const bicho = resultado.inusitado
+    ? `meu pet 🐾 (detalhe: é ${resultado.especie} 🙃)`
+    : resultado.especie === "gato"
+      ? "meu gato 🐱"
+      : "meu cachorro 🐶";
   return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl}`;
 }
 
