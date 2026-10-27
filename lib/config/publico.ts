@@ -21,24 +21,16 @@ function urlSemBarraFinal(valor: string | undefined, padrao: string): string {
 }
 
 /**
- * Ordem de prioridade do endereço do site:
- * 1. NEXT_PUBLIC_SITE_URL (defina quando tiver domínio próprio);
- * 2. domínio de produção que a própria Vercel informa no build;
- * 3. o endereço atual na Vercel.
+ * Endereço público do site: NEXT_PUBLIC_SITE_URL (quando houver domínio próprio) ou o padrão.
+ * Não usamos o domínio que a Vercel informa automaticamente: com mais de um domínio no projeto,
+ * ela pode apontar para o antigo (aconteceu na troca de tal-dono-tal-cao para tal-dono-tal-pet).
  */
-export function resolverSiteUrl(
-  siteUrl: string | undefined,
-  dominioProducaoVercel: string | undefined,
-  padrao = SITE_PADRAO,
-): string {
-  return urlSemBarraFinal(comProtocolo(siteUrl) ?? comProtocolo(dominioProducaoVercel), padrao);
+export function resolverSiteUrl(siteUrl: string | undefined, padrao = SITE_PADRAO): string {
+  return urlSemBarraFinal(comProtocolo(siteUrl), padrao);
 }
 
 export const configPublica = {
-  siteUrl: resolverSiteUrl(
-    process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
-  ),
+  siteUrl: resolverSiteUrl(process.env.NEXT_PUBLIC_SITE_URL),
   contatoEmail: process.env.NEXT_PUBLIC_CONTATO_EMAIL?.trim() || EMAIL_PADRAO,
 } as const;
 
