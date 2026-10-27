@@ -59,6 +59,39 @@ describe("AnalisadorAnthropic", () => {
       new AnalisadorAnthropic({ ...OPCOES, fetch: quebrado }).analisar(IMG, IMG),
     ).rejects.toBeInstanceOf(ErroAnalise);
   });
+
+  it("REGRESSÃO: não envia temperature, top_p nem top_k (o Claude Haiku 5.5 não aceita)", async () => {
+    const { fn, chamadas } = fetchFalso(200, {
+      content: [{ type: "tool_use", name: FERRAMENTA_RESULTADO.name, input: { valido: true } }],
+    });
+    await new AnalisadorAnthropic({ ...OPCOES, fetch: fn }).analisar(IMG, IMG);
+    const corpo = JSON.parse(String(chamadas[0].init?.body));
+    expect(corpo).not.toHaveProperty("temperature");
+    expect(corpo).not.toHaveProperty("top_p");
+    expect(corpo).not.toHaveProperty("top_k");
+  });
+
+  it("não termina a conversa com mensagem do assistente (prefill dá erro 400 no Haiku 5.5)", async () => {
+    const { fn, chamadas } = fetchFalso(200, {
+      content: [{ type: "tool_use", name: FERRAMENTA_RESULTADO.name, input: { valido: true } }],
+    });
+    await new AnalisadorAnthropic({ ...OPCOES, fetch: fn }).analisar(IMG, IMG);
+    const { messages } = JSON.parse(String(chamadas[0].init?.body));
+    expect(messages.at(-1).role).toBe("user");
+  });
+
+  it("recusa do modelo vira resultado inválido amigável, não erro técnico", async () => {
+    const { fn } = fetchFalso(200, { content: [], stop_reason: "refusal" });
+    const r = await new AnalisadorAnthropic({ ...OPCOES, fetch: fn }).analisar(IMG, IMG);
+    expect(r).toMatchObject({ valido: false, motivo: "outro" });
+  });
+
+  it("resposta cortada por max_tokens vira ErroAnalise com o motivo", async () => {
+    const { fn } = fetchFalso(200, { content: [{ type: "text", text: "..." }], stop_reason: "max_tokens" });
+    await expect(new AnalisadorAnthropic({ ...OPCOES, fetch: fn }).analisar(IMG, IMG)).rejects.toThrow(
+      /max_tokens/,
+    );
+  });
 });
 
 describe("AnalisadorDemo", () => {

@@ -5,8 +5,10 @@ import type { Resultado } from "@/lib/tipos";
 
 const URL_API = "https://api.anthropic.com/v1/messages";
 const VERSAO_API = "2023-06-01";
-const MAX_TOKENS = 1200;
-const TEMPERATURA = 0.8;
+// Folga generosa: o Haiku 5.5 gasta ~30% mais tokens que modelos anteriores para o mesmo texto.
+const MAX_TOKENS = 2048;
+// Não enviar temperature/top_p/top_k: o Claude Haiku 5.5 não aceita esses parâmetros
+// (o tom das respostas é controlado só pelo prompt).
 
 export type OpcoesAnthropic = {
   chave: string;
@@ -17,6 +19,7 @@ export type OpcoesAnthropic = {
 };
 
 type BlocoConteudo = { type: string; name?: string; input?: Record<string, unknown> };
+type RespostaApi = { content?: BlocoConteudo[]; stop_reason?: string };
 
 export class AnalisadorAnthropic implements AnalisadorDeFotos {
   readonly consomeCota = true;
@@ -28,17 +31,23 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
 
   async analisar(pessoa: ImagemBase64, cachorro: ImagemBase64): Promise<Resultado> {
     const resposta = await this.chamarApi(pessoa, cachorro);
+
+    // O modelo pode se recusar a analisar (ex.: conteúdo impróprio). Não é falha técnica:
+    // o usuário recebe uma mensagem amigável para tentar com outras fotos.
+    if (resposta.stop_reason === "refusal") {
+      return normalizarResultado({ valido: false, motivo: "outro" });
+    }
+
     const bloco = resposta.content?.find(
       (c) => c.type === "tool_use" && c.name === FERRAMENTA_RESULTADO.name,
     );
-    if (!bloco?.input) throw new ErroAnalise("Resposta da IA sem resultado");
+    if (!bloco?.input) {
+      throw new ErroAnalise(`Resposta da IA sem resultado (stop_reason: ${resposta.stop_reason ?? "?"})`);
+    }
     return normalizarResultado(bloco.input);
   }
 
-  private async chamarApi(
-    pessoa: ImagemBase64,
-    cachorro: ImagemBase64,
-  ): Promise<{ content?: BlocoConteudo[] }> {
+  private async chamarApi(pessoa: ImagemBase64, cachorro: ImagemBase64): Promise<RespostaApi> {
     let resposta: Response;
     try {
       resposta = await this.fetch(URL_API, {
@@ -71,7 +80,6 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     return {
       model: this.opcoes.modelo,
       max_tokens: MAX_TOKENS,
-      temperature: TEMPERATURA,
       system: PROMPT_SISTEMA,
       tools: [FERRAMENTA_RESULTADO],
       tool_choice: { type: "tool", name: FERRAMENTA_RESULTADO.name },
