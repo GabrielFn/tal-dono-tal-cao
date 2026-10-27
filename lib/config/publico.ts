@@ -25,8 +25,23 @@ function urlSemBarraFinal(valor: string | undefined, padrao: string): string {
  * Não usamos o domínio que a Vercel informa automaticamente: com mais de um domínio no projeto,
  * ela pode apontar para o antigo (aconteceu na troca de tal-dono-tal-cao para tal-dono-tal-pet).
  */
+/**
+ * Domínios antigos que hoje só redirecionam. Nunca podem ser o endereço oficial (canonical):
+ * isso faria o Google indexar o endereço errado.
+ */
+const DOMINIOS_ANTIGOS = ["tal-dono-tal-cao.vercel.app"];
+
+function ehDominioAntigo(url: string): boolean {
+  try {
+    return DOMINIOS_ANTIGOS.includes(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function resolverSiteUrl(siteUrl: string | undefined, padrao = SITE_PADRAO): string {
-  return urlSemBarraFinal(comProtocolo(siteUrl), padrao);
+  const url = urlSemBarraFinal(comProtocolo(siteUrl), padrao);
+  return ehDominioAntigo(url) ? padrao : url;
 }
 
 export const configPublica = {

@@ -15,4 +15,11 @@ describe("resolverSiteUrl", () => {
     expect(resolverSiteUrl("   ")).toBe("https://tal-dono-tal-pet.vercel.app");
     expect(resolverSiteUrl("https://")).toBe("https://tal-dono-tal-pet.vercel.app");
   });
+
+  it("nunca usa o domínio antigo, mesmo se a variável estiver com ele", () => {
+    expect(resolverSiteUrl("https://tal-dono-tal-cao.vercel.app")).toBe(
+      "https://tal-dono-tal-pet.vercel.app",
+    );
+    expect(resolverSiteUrl("tal-dono-tal-cao.vercel.app/")).toBe("https://tal-dono-tal-pet.vercel.app");
+  });
 });

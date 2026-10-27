@@ -702,3 +702,53 @@ h1 {
   font-weight: 800;
   font-size: 0.9rem;
 }
+
+/* Perguntas frequentes */
+.perguntas {
+  margin-top: 28px;
+  padding: 22px;
+  background: var(--branco);
+  border: var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+.perguntas h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+.perguntas details {
+  border-top: 2px dashed rgba(42, 26, 16, 0.2);
+  padding: 10px 0;
+}
+.perguntas details:first-of-type {
+  border-top: none;
+}
+.perguntas summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.perguntas summary::-webkit-details-marker {
+  display: none;
+}
+.perguntas summary::after {
+  content: "+";
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: var(--laranja);
+}
+.perguntas details[open] summary::after {
+  content: "–";
+}
+.perguntas h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.perguntas p {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+}

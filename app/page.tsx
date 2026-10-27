@@ -1,12 +1,21 @@
 import App from "@/components/App";
 import Rodape from "@/components/Rodape";
+import { configPublica } from "@/lib/config/publico";
 import { lerConfigServidor } from "@/lib/config/servidor";
+import { dadosEstruturados, PERGUNTAS_FREQUENTES } from "@/lib/conteudo/seo";
 
 export default function Home() {
   // O preço vem do servidor (variável PRECO_PREMIUM_CENTAVOS) para não ficar duplicado.
   const { precoPremiumCentavos } = lerConfigServidor().pagamento;
   return (
     <main className="pagina">
+      <script
+        type="application/ld+json"
+        // JSON gerado por nós a partir de constantes; o replace evita fechar a tag <script> por engano.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(dadosEstruturados(configPublica.siteUrl)).replace(/</g, "\\u003c"),
+        }}
+      />
       <header className="cabecalho">
         <p className="marca">Tal Dono, Tal Pet 🐾</p>
         <h1>
@@ -25,7 +34,8 @@ export default function Home() {
             tiver aí.
           </li>
           <li>
-            <strong>A IA compara.</strong> Olhar, cabelo x pelo, expressão, pose e vibe.
+            <strong>A inteligência artificial compara.</strong> Olhar, cabelo x pelo, expressão, pose e vibe
+            viram uma nota de 0 a 100%.
           </li>
           <li>
             <strong>Compartilhe.</strong> Receba sua nota e um card pronto para os Stories e o TikTok.
@@ -35,6 +45,18 @@ export default function Home() {
           Tem até ciência: estudos de psicologia mostram que muita gente escolhe pets parecidos consigo,
           principalmente no olhar.
         </p>
+      </section>
+
+      <section className="perguntas" aria-labelledby="faq">
+        <h2 id="faq">Perguntas frequentes</h2>
+        {PERGUNTAS_FREQUENTES.map(({ pergunta, resposta }) => (
+          <details key={pergunta}>
+            <summary>
+              <h3>{pergunta}</h3>
+            </summary>
+            <p>{resposta}</p>
+          </details>
+        ))}
       </section>
 
       <Rodape />
