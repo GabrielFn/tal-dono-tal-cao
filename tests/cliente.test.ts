@@ -13,6 +13,10 @@ const RESULTADO: ResultadoValido = {
   fraseCard: "f",
   racaProvavel: "r",
   categorias: [],
+  ehCachorro: true,
+  especie: "cachorro",
+  somDoAnimal: "AU-AU",
+  plotTwist: "",
 };
 
 const comFotos: Estado = { ...ESTADO_INICIAL, fotos: { pessoa: "p", cachorro: "c" } };
@@ -92,7 +96,7 @@ describe("solicitarAnalise", () => {
   });
 
   it("repassa a mensagem de foto inválida", async () => {
-    const { fn } = fetchFalso(200, { valido: false, motivo: "sem_cachorro", mensagem: "Cadê o au-au?" });
+    const { fn } = fetchFalso(200, { valido: false, motivo: "sem_animal", mensagem: "Cadê o au-au?" });
     expect(await solicitarAnalise("p", "c", fn)).toEqual({ ok: false, mensagem: "Cadê o au-au?" });
   });
 
@@ -108,7 +112,21 @@ describe("solicitarAnalise", () => {
 
 describe("textoDeCompartilhamento", () => {
   it("inclui a nota e o site", () => {
-    expect(textoDeCompartilhamento(87, "https://site.com")).toContain("87%");
-    expect(textoDeCompartilhamento(87, "https://site.com")).toContain("https://site.com");
+    const texto = textoDeCompartilhamento(
+      { nota: 87, ehCachorro: true, especie: "cachorro" },
+      "https://site.com",
+    );
+    expect(texto).toContain("87%");
+    expect(texto).toContain("meu cachorro");
+    expect(texto).toContain("https://site.com");
+  });
+
+  it("entrega o plot twist quando não é cachorro, sem errar o gênero", () => {
+    const texto = textoDeCompartilhamento(
+      { nota: 72, ehCachorro: false, especie: "calopsita" },
+      "https://site.com",
+    );
+    expect(texto).toContain("é calopsita");
+    expect(texto).not.toContain("meu calopsita");
   });
 });

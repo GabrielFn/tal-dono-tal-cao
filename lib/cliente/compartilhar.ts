@@ -1,3 +1,5 @@
+import type { ResultadoValido } from "@/lib/tipos";
+
 // Compartilhamento do card: usa o menu nativo do celular quando existe, senão baixa o arquivo.
 
 export const NOME_ARQUIVO_CARD = "tal-dono-tal-cao.png";
@@ -9,8 +11,15 @@ export function baixarArquivo(url: string, nome = NOME_ARQUIVO_CARD): void {
   link.click();
 }
 
-export function textoDeCompartilhamento(nota: number, siteUrl: string): string {
-  return `Deu ${nota}% de semelhança entre eu e meu cachorro 🐶 Descubra o seu: ${siteUrl}`;
+export function textoDeCompartilhamento(
+  resultado: Pick<ResultadoValido, "nota" | "ehCachorro" | "especie">,
+  siteUrl: string,
+): string {
+  // "pet" evita errar o gênero ("meu calopsita").
+  const bicho = resultado.ehCachorro
+    ? "meu cachorro 🐶"
+    : `meu pet 🐾 (detalhe: é ${resultado.especie}, num app de cachorro 🙃)`;
+  return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl}`;
 }
 
 /** Devolve "compartilhado", "cancelado" ou "baixado" (quando o aparelho não suporta compartilhar arquivos). */

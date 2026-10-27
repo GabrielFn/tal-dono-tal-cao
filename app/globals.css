@@ -322,6 +322,40 @@ h1 {
   font-weight: 900;
   box-shadow: 3px 3px 0 var(--tinta);
 }
+.plot-twist {
+  position: relative;
+  margin: 26px 8px 4px;
+  padding: 20px 16px 14px;
+  background: var(--amarelo);
+  border: var(--borda);
+  border-radius: 16px;
+  box-shadow: var(--sombra);
+  transform: rotate(-1.5deg);
+  font-weight: 700;
+  animation: surgir 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.plot-twist-selo {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  padding: 2px 14px;
+  background: var(--laranja);
+  color: var(--branco);
+  border: var(--borda);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+  }
+}
 .medidor {
   margin: 18px 0 4px;
 }

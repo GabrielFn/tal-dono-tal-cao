@@ -29,6 +29,7 @@ const LAYOUT = {
   frase: { espaco: 10, tamanho: 46, alturaLinha: 60, largura: 900, maxLinhas: 2 },
   rodape: { x: 120, y: 1740, largura: 840, altura: 110, tamanhoMax: 40, tamanhoMin: 20, larguraTexto: 760 },
   bolinhas: { espaco: 60, raio: 5 },
+  plotTwist: { y: 250, altura: 76, rotacao: -0.05, tamanhoMax: 38, tamanhoMin: 22, larguraMax: 860 },
 } as const;
 
 type Ctx = CanvasRenderingContext2D;
@@ -123,6 +124,38 @@ function desenharEtiqueta(ctx: Ctx, texto: string, cx: number, cor: string) {
 
   ctx.fillStyle = COR.branco;
   ctx.fillText(texto, cx, cy + 2);
+}
+
+/** Selo inclinado "PLOT TWIST: É UM GATO!" quando o bicho não é cachorro. */
+function desenharSeloPlotTwist(ctx: Ctx, especie: string) {
+  const p = LAYOUT.plotTwist;
+  const texto = `PLOT TWIST: É ${especie.toLocaleUpperCase("pt-BR")}!`;
+
+  let tamanho: number = p.tamanhoMax;
+  ctx.font = fonte(900, tamanho);
+  while (ctx.measureText(texto).width > p.larguraMax - 60 && tamanho > p.tamanhoMin) {
+    tamanho -= 2;
+    ctx.font = fonte(900, tamanho);
+  }
+  const largura = ctx.measureText(texto).width + 60;
+
+  ctx.save();
+  ctx.translate(CENTRO_X, p.y);
+  ctx.rotate(p.rotacao);
+  ctx.fillStyle = COR.tinta;
+  ctx.beginPath();
+  ctx.roundRect(-largura / 2 + 7, -p.altura / 2 + 7, largura, p.altura, 14);
+  ctx.fill();
+  ctx.fillStyle = COR.amarelo;
+  ctx.beginPath();
+  ctx.roundRect(-largura / 2, -p.altura / 2, largura, p.altura, 14);
+  ctx.fill();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = COR.tinta;
+  ctx.stroke();
+  ctx.fillStyle = COR.tinta;
+  ctx.fillText(texto, 0, 3);
+  ctx.restore();
 }
 
 function desenharSelo(ctx: Ctx) {
@@ -236,7 +269,8 @@ export async function gerarCard(
   desenharFotoCircular(ctx, imgPessoa, LAYOUT.fotos.xPessoa);
   desenharFotoCircular(ctx, imgCachorro, LAYOUT.fotos.xCachorro);
   desenharEtiqueta(ctx, "EU", LAYOUT.fotos.xPessoa, COR.verde);
-  desenharEtiqueta(ctx, "AU-AU", LAYOUT.fotos.xCachorro, COR.laranja);
+  desenharEtiqueta(ctx, resultado.somDoAnimal, LAYOUT.fotos.xCachorro, COR.laranja);
+  if (!resultado.ehCachorro) desenharSeloPlotTwist(ctx, resultado.especie);
   desenharSelo(ctx);
   desenharNota(ctx, resultado.nota);
   desenharTextos(ctx, resultado.titulo, resultado.fraseCard);

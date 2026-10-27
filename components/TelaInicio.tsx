@@ -54,7 +54,7 @@ export default function TelaInicio({ estado, pronto, onEscolherFoto, onAnalisar 
         />
         <SlotFoto
           rotulo="Seu cachorro"
-          dica="Focinho bem visível"
+          dica="Focinho bem visível (gato e papagaio também valem 👀)"
           emoji="🐶"
           cor="var(--laranja)"
           foto={estado.fotos.cachorro}

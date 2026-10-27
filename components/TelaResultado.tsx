@@ -37,7 +37,7 @@ function AreaDoCard({ resultado, fotoPessoa, fotoCachorro }: Omit<Props, "onReco
 
   const compartilhar = () =>
     card &&
-    compartilharImagem(card.blob, card.url, textoDeCompartilhamento(resultado.nota, configPublica.siteUrl));
+    compartilharImagem(card.blob, card.url, textoDeCompartilhamento(resultado, configPublica.siteUrl));
 
   return (
     <div className="card-area">
@@ -74,8 +74,19 @@ export default function TelaResultado({ resultado, fotoPessoa, fotoCachorro, onR
           ≈
         </span>
         {/* eslint-disable-next-line @next/next/no-img-element -- data URL local */}
-        <img src={fotoCachorro} alt="Seu cachorro" className="dupla-foto" />
+        <img
+          src={fotoCachorro}
+          alt={resultado.ehCachorro ? "Seu cachorro" : `Seu pet (${resultado.especie})`}
+          className="dupla-foto"
+        />
       </div>
+
+      {!resultado.ehCachorro && (
+        <p className="plot-twist" role="status">
+          <span className="plot-twist-selo">Plot twist!</span>
+          {resultado.plotTwist}
+        </p>
+      )}
 
       <Medidor nota={resultado.nota} />
       <h2 className="titulo-resultado">{resultado.titulo}</h2>

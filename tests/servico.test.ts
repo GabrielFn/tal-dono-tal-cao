@@ -15,6 +15,10 @@ const RESULTADO: Resultado = {
   fraseCard: "f",
   racaProvavel: "r",
   categorias: [],
+  ehCachorro: true,
+  especie: "cachorro",
+  somDoAnimal: "AU-AU",
+  plotTwist: "",
 };
 
 function analisador(comportamento: () => Promise<Resultado>, consomeCota = true): AnalisadorDeFotos {
@@ -102,7 +106,7 @@ describe("analisarFotos", () => {
 
   it("resultado inválido da IA (ex.: sem cachorro) conta como uso, pois a IA trabalhou", async () => {
     const { reserva, devolver } = reservaOk();
-    const invalido: Resultado = { valido: false, motivo: "sem_cachorro", mensagem: "Cadê o cachorro?" };
+    const invalido: Resultado = { valido: false, motivo: "sem_animal", mensagem: "Cadê o cachorro?" };
     const r = await analisarFotos(
       CORPO_VALIDO,
       "ip",

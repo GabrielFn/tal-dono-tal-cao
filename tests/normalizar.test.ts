@@ -57,7 +57,7 @@ describe("normalizarResultado", () => {
     const r = normalizarResultado({ valido: true, titulo: "x".repeat(500), racaProvavel: "  " });
     if (!r.valido) throw new Error("esperava válido");
     expect(r.titulo).toHaveLength(50);
-    expect(r.racaProvavel).toBe("Cachorro de respeito");
+    expect(r.racaProvavel).toBe("Bicho de respeito");
   });
 
   it("converte resultado inválido com motivo desconhecido em 'outro'", () => {
@@ -70,7 +70,77 @@ describe("normalizarResultado", () => {
 
   it("mantém a mensagem da IA para resultado inválido", () => {
     expect(
-      normalizarResultado({ valido: false, motivo: "sem_cachorro", mensagem: "Isso é um gato!" }),
-    ).toEqual({ valido: false, motivo: "sem_cachorro", mensagem: "Isso é um gato!" });
+      normalizarResultado({ valido: false, motivo: "sem_animal", mensagem: "Isso é uma pantufa!" }),
+    ).toEqual({ valido: false, motivo: "sem_animal", mensagem: "Isso é uma pantufa!" });
+  });
+});
+
+describe("normalizarResultado: quando o bicho não é cachorro", () => {
+  const base = { valido: true, nota: 70, titulo: "t" };
+
+  it("cachorro tem AU-AU e nenhum plot twist, mesmo se a IA inventar", () => {
+    const r = normalizarResultado({ ...base, ehCachorro: true, somDoAnimal: "MIAU", plotTwist: "x" });
+    expect(r).toMatchObject({ ehCachorro: true, especie: "cachorro", somDoAnimal: "AU-AU", plotTwist: "" });
+  });
+
+  it("assume cachorro quando a IA não informa a espécie (compatibilidade)", () => {
+    expect(normalizarResultado(base)).toMatchObject({ ehCachorro: true, somDoAnimal: "AU-AU" });
+  });
+
+  it("mantém espécie, som e plot twist de outro bicho", () => {
+    const r = normalizarResultado({
+      ...base,
+      ehCachorro: false,
+      especie: "Gato",
+      somDoAnimal: "miau",
+      plotTwist: "É um gato.",
+    });
+    expect(r).toMatchObject({
+      ehCachorro: false,
+      especie: "gato",
+      somDoAnimal: "MIAU",
+      plotTwist: "É um gato.",
+    });
+  });
+
+  it("limpa o som para caber e ser seguro no card", () => {
+    const r = normalizarResultado({
+      ...base,
+      ehCachorro: false,
+      especie: "pato",
+      somDoAnimal: "quack!!! 🦆 <b>quack</b>",
+    });
+    if (!r.valido) throw new Error("esperava válido");
+    expect(r.somDoAnimal).toMatch(/^[\p{Lu}\-. ]{1,10}$/u);
+    expect(r.somDoAnimal.startsWith("QUACK")).toBe(true);
+  });
+
+  it("aceita acentos no som (CÓ-CÓ)", () => {
+    const r = normalizarResultado({ ...base, ehCachorro: false, especie: "galinha", somDoAnimal: "có-có" });
+    expect(r).toMatchObject({ somDoAnimal: "CÓ-CÓ" });
+  });
+
+  it("preenche padrões engraçados se a IA esquecer", () => {
+    const r = normalizarResultado({ ...base, ehCachorro: false });
+    expect(r).toMatchObject({ especie: "bicho misterioso", somDoAnimal: "???" });
+    if (!r.valido) throw new Error("esperava válido");
+    expect(r.plotTwist).toContain("não é um cachorro");
+  });
+
+  it("converte o motivo antigo 'sem_cachorro' para 'sem_animal'", () => {
+    expect(normalizarResultado({ valido: false, motivo: "sem_cachorro" })).toMatchObject({
+      motivo: "sem_animal",
+    });
+  });
+
+  it("tira o 'Plot twist:' repetido do começo da frase", () => {
+    for (const bruto of [
+      "Plot twist: isso é um gato.",
+      "PLOT TWIST! isso é um gato.",
+      "plot-twist — isso é um gato.",
+    ]) {
+      const r = normalizarResultado({ ...base, ehCachorro: false, especie: "gato", plotTwist: bruto });
+      expect(r).toMatchObject({ plotTwist: "Isso é um gato." });
+    }
   });
 });

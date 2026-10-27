@@ -2,6 +2,8 @@
 import type { ResultadoValido } from "@/lib/tipos";
 import type { AnalisadorDeFotos } from "./tipos";
 
+const CACHORRO = { ehCachorro: true, especie: "cachorro", somDoAnimal: "AU-AU", plotTwist: "" } as const;
+
 const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
   {
     nota: 87,
@@ -10,6 +12,7 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       "Mesma cabeça inclinada, mesmo olhar de 'já volto, só vou pegar um petisco'. Se trocar de lugar, ninguém percebe.",
     fraseCard: "Juntos desde sempre, iguais desde o primeiro olhar.",
     racaProvavel: "Golden Retriever",
+    ...CACHORRO,
     categorias: [
       {
         nome: "Olhar",
@@ -41,6 +44,7 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       "O olhar desconfiado é de família, mas o cabelo arrumado do humano o cachorro definitivamente não puxou.",
     fraseCard: "Parentes? Talvez. Cúmplices? Com certeza.",
     racaProvavel: "SRD caramelo",
+    ...CACHORRO,
     categorias: [
       { nome: "Olhar", nota: 71, comentario: "Os dois parecem estar julgando o fotógrafo em silêncio." },
       { nome: "Cabelo x pelo", nota: 32, comentario: "Um foi ao salão, o outro rolou na grama. Clássico." },
@@ -56,6 +60,7 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       "Ele é pura elegância serena, o cachorro é caos com quatro patas. Ainda assim, a dupla funciona demais.",
     fraseCard: "Zero parecidos, 100% inseparáveis.",
     racaProvavel: "Vira-lata de respeito",
+    ...CACHORRO,
     categorias: [
       {
         nome: "Olhar",
@@ -70,6 +75,33 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       },
       { nome: "Pose e postura", nota: 25, comentario: "Postura de foto 3x4 contra pose de quem ia correr." },
       { nome: "Vibe", nota: 38, comentario: "O equilíbrio perfeito: um acalma, o outro anima." },
+    ],
+  },
+  {
+    nota: 72,
+    titulo: "Gato infiltrado detectado",
+    veredito:
+      "Os dois encaram a câmera com a mesma cara de quem foi interrompido no meio de algo muito importante. A pose de superioridade é idêntica.",
+    fraseCard: "Não é cachorro, mas a arrogância é de família.",
+    racaProvavel: "Siamês de nariz empinado",
+    ehCachorro: false,
+    especie: "gato",
+    somDoAnimal: "MIAU",
+    plotTwist: "Isso é um gato. Ele sabe que o app é de cachorro e simplesmente não se importa.",
+    categorias: [
+      { nome: "Olhar", nota: 88, comentario: "O mesmo olhar de julgamento silencioso. Assustador." },
+      {
+        nome: "Cabelo x pelo",
+        nota: 61,
+        comentario: "Os dois estão impecáveis, mas só um se lambe para isso.",
+      },
+      { nome: "Expressão", nota: 79, comentario: "Zero sorriso, 100% de 'eu deixo você morar aqui'." },
+      {
+        nome: "Pose e postura",
+        nota: 66,
+        comentario: "Queixo levantado nos dois. Realeza reconhece realeza.",
+      },
+      { nome: "Vibe", nota: 70, comentario: "Dupla que ignora mensagens no grupo da família." },
     ],
   },
 ];
