@@ -6,7 +6,8 @@ import type { Resultado } from "@/lib/tipos";
 const URL_API = "https://api.anthropic.com/v1/messages";
 const VERSAO_API = "2023-06-01";
 // Folga generosa: o Haiku 5.5 gasta ~30% mais tokens que modelos anteriores para o mesmo texto.
-const MAX_TOKENS = 2048;
+// O inventário visual (observacoes) vem antes do resultado e ocupa espaço.
+const MAX_TOKENS = 3000;
 // Não enviar temperature/top_p/top_k: o Claude Haiku 5.5 não aceita esses parâmetros
 // (o tom das respostas é controlado só pelo prompt).
 
@@ -91,7 +92,10 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
             imagem(pessoa),
             { type: "text", text: "Foto 2 (deveria ser o pet):" },
             imagem(pet),
-            { type: "text", text: "Compare os dois e registre o resultado." },
+            {
+              type: "text",
+              text: "Faça primeiro o inventário detalhado das duas fotos e só depois compare. Quero o detalhe que ninguém percebeu, nada de frase genérica.",
+            },
           ],
         },
       ],

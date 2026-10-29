@@ -12,6 +12,7 @@ const RESULTADO: Resultado = {
   nota: 80,
   titulo: "t",
   veredito: "v",
+  detalheSecreto: "",
   fraseCard: "f",
   racaProvavel: "r",
   categorias: [],

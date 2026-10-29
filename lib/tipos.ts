@@ -11,6 +11,8 @@ export type ResultadoValido = {
   nota: number; // 0 a 100
   titulo: string;
   veredito: string;
+  /** A coincidência mais surpreendente e específica entre as duas fotos (pode vir vazia). */
+  detalheSecreto: string;
   fraseCard: string;
   racaProvavel: string;
   categorias: Categoria[];

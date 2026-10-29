@@ -94,6 +94,12 @@ export default function TelaResultado({
       <Medidor nota={resultado.nota} />
       <h2 className="titulo-resultado">{resultado.titulo}</h2>
       <p className="veredito">{resultado.veredito}</p>
+      {resultado.detalheSecreto && (
+        <p className="detalhe-secreto">
+          <span className="detalhe-secreto-rotulo">🔍 O detalhe que ninguém notou</span>
+          {resultado.detalheSecreto}
+        </p>
+      )}
       <p className="raca">
         Raça provável: <strong>{resultado.racaProvavel}</strong>
       </p>

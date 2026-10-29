@@ -7,17 +7,18 @@ const CACHORRO = { inusitado: false, especie: "cachorro", somDoAnimal: "AU-AU", 
 const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
   {
     nota: 87,
-    titulo: "Almas gêmeas de focinho",
+    titulo: "Franja e orelha sincronizadas",
     veredito:
-      "Mesma cabeça inclinada, mesmo olhar de 'já volto, só vou pegar um petisco'. Se trocar de lugar, ninguém percebe.",
-    fraseCard: "Juntos desde sempre, iguais desde o primeiro olhar.",
+      "Sua franja cai para a esquerda exatamente como a orelha dobrada dele, e os dois foram fotografados de cima, no mesmo sofá cinza. Isso não é coincidência, é decoração.",
+    detalheSecreto: "A mecha que cai no seu olho esquerdo e a orelha dobrada dele fazem a mesma curva.",
+    fraseCard: "A franja é minha, a orelha é dele, o penteado é nosso.",
     racaProvavel: "Golden Retriever",
     ...CACHORRO,
     categorias: [
       {
         nome: "Olhar",
         nota: 92,
-        comentario: "Os dois olham para a câmera como quem pede desculpa sem ter culpa.",
+        comentario: "Os dois olham um pouco acima da lente, para a esquerda. Mesmo ponto fixo.",
       },
       {
         nome: "Cabelo x pelo",
@@ -27,38 +28,49 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       {
         nome: "Expressão",
         nota: 90,
-        comentario: "Sorriso de canto idêntico, nível propaganda de margarina.",
+        comentario: "Canto direito da boca puxado para cima nos dois. Assimetria de família.",
       },
       {
         nome: "Pose e postura",
         nota: 78,
         comentario: "Cabeça levemente de lado, a pose oficial da família.",
       },
-      { nome: "Vibe", nota: 91, comentario: "Energia de domingo à tarde no parque." },
+      { nome: "Vibe", nota: 91, comentario: "Moletom mostarda e coleira mostarda. Alguém escolheu isso." },
     ],
   },
   {
     nota: 54,
     titulo: "Primos de segundo grau",
     veredito:
-      "O olhar desconfiado é de família, mas o cabelo arrumado do humano o cachorro definitivamente não puxou.",
-    fraseCard: "Parentes? Talvez. Cúmplices? Com certeza.",
+      "A ruguinha entre as suas sobrancelhas está desenhada na testa dele em pelo mais escuro. O cabelo com gel, por outro lado, ele não puxou.",
+    detalheSecreto: "Aquele vinco que você faz entre as sobrancelhas, ele tem pintado de fábrica.",
+    fraseCard: "A testa franzida é hereditária. O gel, não.",
     racaProvavel: "SRD caramelo",
     ...CACHORRO,
     categorias: [
       { nome: "Olhar", nota: 71, comentario: "Os dois parecem estar julgando o fotógrafo em silêncio." },
       { nome: "Cabelo x pelo", nota: 32, comentario: "Um foi ao salão, o outro rolou na grama. Clássico." },
-      { nome: "Expressão", nota: 60, comentario: "Boca fechada, cara de quem sabe de alguma fofoca." },
+      {
+        nome: "Expressão",
+        nota: 60,
+        comentario: "Lábio de baixo levemente para fora nos dois. Alguém aí está emburrado.",
+      },
       { nome: "Pose e postura", nota: 48, comentario: "Um posou, o outro foi pego de surpresa." },
-      { nome: "Vibe", nota: 63, comentario: "Dupla de quem se entende sem precisar falar." },
+      {
+        nome: "Vibe",
+        nota: 63,
+        comentario: "Você de camisa social, ele deitado no tapete xadrez. Escritório e home office.",
+      },
     ],
   },
   {
     nota: 29,
     titulo: "Opostos que se atraem",
     veredito:
-      "Ele é pura elegância serena, o cachorro é caos com quatro patas. Ainda assim, a dupla funciona demais.",
-    fraseCard: "Zero parecidos, 100% inseparáveis.",
+      "Você posou de frente, cabelo preso, gola fechada até o pescoço. Ele está de ponta-cabeça no chão com uma meia na boca. Nada bate, exceto a meia, que é sua.",
+    detalheSecreto:
+      "A única coisa em comum entre vocês é a meia listrada. Ela está no seu pé e na boca dele.",
+    fraseCard: "Nada em comum. Só a meia.",
     racaProvavel: "Vira-lata de respeito",
     ...CACHORRO,
     categorias: [
@@ -71,44 +83,63 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
       {
         nome: "Expressão",
         nota: 30,
-        comentario: "Sorriso discreto contra língua para fora. Placar desigual.",
+        comentario: "Boca fechada e reta contra língua de lado segurando uma meia. Placar desigual.",
       },
       { nome: "Pose e postura", nota: 25, comentario: "Postura de foto 3x4 contra pose de quem ia correr." },
-      { nome: "Vibe", nota: 38, comentario: "O equilíbrio perfeito: um acalma, o outro anima." },
+      {
+        nome: "Vibe",
+        nota: 38,
+        comentario: "Parede branca e organizada atrás de você; atrás dele, o caos da lavanderia.",
+      },
     ],
   },
   {
     nota: 72,
     titulo: "Realeza felina reconhecida",
     veredito:
-      "Os dois encaram a câmera com a mesma cara de quem foi interrompido no meio de algo muito importante. A pose de superioridade é idêntica.",
-    fraseCard: "A arrogância é de família.",
+      "Os dois estão com o queixo apontado para o canto superior direito e as pálpebras a meio mastro. Até a luz da janela bate do mesmo lado.",
+    detalheSecreto: "Vocês estão com o queixo no mesmo ângulo, uns 20 graus para cima. Ensaiado ou genética?",
+    fraseCard: "Queixo alto e pálpebra a meio mastro: é de família.",
     racaProvavel: "Siamês de nariz empinado",
     inusitado: false,
     especie: "gato",
     somDoAnimal: "MIAU",
     plotTwist: "",
     categorias: [
-      { nome: "Olhar", nota: 88, comentario: "O mesmo olhar de julgamento silencioso. Assustador." },
+      {
+        nome: "Olhar",
+        nota: 88,
+        comentario: "Pálpebras pela metade nos dois, olhando de cima para baixo. Assustador.",
+      },
       {
         nome: "Cabelo x pelo",
         nota: 61,
         comentario: "Os dois estão impecáveis, mas só um se lambe para isso.",
       },
-      { nome: "Expressão", nota: 79, comentario: "Zero sorriso, 100% de 'eu deixo você morar aqui'." },
+      {
+        nome: "Expressão",
+        nota: 79,
+        comentario: "Boca reta, bochechas paradas, testa lisa. Zero esforço facial dos dois.",
+      },
       {
         nome: "Pose e postura",
         nota: 66,
         comentario: "Queixo levantado nos dois. Realeza reconhece realeza.",
       },
-      { nome: "Vibe", nota: 70, comentario: "Dupla que ignora mensagens no grupo da família." },
+      {
+        nome: "Vibe",
+        nota: 70,
+        comentario: "Você de cinza-claro, ela cinza-claro com ponta escura. Mesma paleta.",
+      },
     ],
   },
   {
     nota: 64,
     titulo: "Calopsita de alta patente",
     veredito:
-      "O topete dela e o seu cabelo de manhã são tecnicamente a mesma obra de arte. A cabeça inclinada de 'oi?' também confere.",
+      "O topete amarelo dela aponta para trás no mesmo ângulo da sua mecha da frente. E as bochechas laranja combinam com a sua caneca ao fundo.",
+    detalheSecreto:
+      "As bolinhas laranja nas bochechas dela são do mesmo tom da caneca na prateleira atrás de você.",
     fraseCard: "Mesmo topete, mesma cara de 'oi?'.",
     racaProvavel: "Calopsita de alta patente",
     inusitado: true,
@@ -123,9 +154,13 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
         nota: 81,
         comentario: "Topete armado nos dois. Ninguém usa pente nessa casa.",
       },
-      { nome: "Expressão", nota: 55, comentario: "Bico versus sorriso: empate técnico na simpatia." },
+      {
+        nome: "Expressão",
+        nota: 55,
+        comentario: "Bico fechado contra boca entreaberta. Os dois parecem prestes a comentar algo.",
+      },
       { nome: "Pose e postura", nota: 66, comentario: "Cabeça inclinada sincronizada. Ensaiaram?" },
-      { nome: "Vibe", nota: 60, comentario: "Dupla que acorda cantando e acorda o prédio junto." },
+      { nome: "Vibe", nota: 60, comentario: "Camiseta amarela, penas amarelas. Uniforme da casa." },
     ],
   },
 ];
