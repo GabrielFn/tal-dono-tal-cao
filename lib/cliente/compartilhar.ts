@@ -12,7 +12,7 @@ export function baixarArquivo(url: string, nome = NOME_ARQUIVO_CARD): void {
 }
 
 export function textoDeCompartilhamento(
-  resultado: Pick<ResultadoValido, "nota" | "inusitado" | "especie">,
+  resultado: Pick<ResultadoValido, "nota" | "inusitado" | "especie" | "halloween">,
   siteUrl: string,
 ): string {
   // Para bicho inusitado, "pet" evita errar o gênero ("meu calopsita").
@@ -21,7 +21,10 @@ export function textoDeCompartilhamento(
     : resultado.especie === "gato"
       ? "meu gato 🐱"
       : "meu cachorro 🐶";
-  return `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}. Descubra o seu: ${siteUrl} #TalDonoTalPet`;
+  const base = `Deu ${resultado.nota}% de semelhança entre eu e ${bicho}.`;
+  const fantasia = resultado.halloween ? ` A IA já escolheu nossa fantasia de Halloween 🎃` : "";
+  const tags = resultado.halloween ? "#TalDonoTalPet #Halloween" : "#TalDonoTalPet";
+  return `${base}${fantasia} Descubra o seu: ${siteUrl} ${tags}`;
 }
 
 /** Baixa um Blob com o nome dado (cria e libera a URL temporária). */

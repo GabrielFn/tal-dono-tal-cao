@@ -1,3 +1,5 @@
+import type { Tema } from "@/lib/conteudo/temporada";
+
 // Instruções enviadas para a IA. Este é o "coração" do app: ajuste aqui o tom das respostas.
 //
 // Estratégia contra respostas genéricas: a IA é obrigada a PRIMEIRO inventariar o que vê
@@ -163,3 +165,39 @@ export const FERRAMENTA_RESULTADO = {
     ],
   },
 } as const;
+
+// ---- Temas sazonais ----
+
+const SECAO_HALLOWEEN = `
+
+EDIÇÃO DE HALLOWEEN (ativa agora)
+Além de tudo acima, preencha:
+- "fantasiaDeDupla": UMA sugestão de fantasia para a dupla usar junta, em 1 frase de até 110 caracteres. Ela TEM que nascer de um detalhe do inventário (cor do pelo, formato da orelha, roupa, acessório, pose, cenário). Ex. de nível esperado: "As orelhas pretas e pontudas dele já são do Batman. Você só precisa da capa." / "Com essa franja e essa juba laranja: abóbora e espantalho, sem gastar nada." / "Você de boné vermelho e ele com uma pata dobrada? Dupla Saci pronta." Evite sugestões genéricas como "vampiro e morcego" sem um motivo visual. Fantasias leves e fofas, nada de sangue ou terror pesado.
+- 31/10 também é o Dia do Saci no Brasil: use a referência quando algum detalhe combinar (gorro ou boné vermelho, uma perna/pata levantada, cachimbo, redemoinho de pelo).
+- "gatoPreto": true SOMENTE se o bicho for um gato predominantemente preto. Caso contrário, false.`;
+
+const SECOES_DO_TEMA: Record<Tema, string> = { halloween: SECAO_HALLOWEEN };
+
+/** Prompt do sistema, com a seção do tema sazonal quando houver. */
+export function promptDoSistema(tema: Tema | null): string {
+  return tema
+    ? PROMPT_SISTEMA.replace(
+        "\n\nResponda SEMPRE chamando a ferramenta",
+        `${SECOES_DO_TEMA[tema]}\n\nResponda SEMPRE chamando a ferramenta`,
+      )
+    : PROMPT_SISTEMA;
+}
+
+/** Ferramenta de resposta, com os campos extras do tema sazonal quando houver. */
+export function ferramentaParaTema(tema: Tema | null) {
+  if (tema !== "halloween") return FERRAMENTA_RESULTADO;
+  const { properties, required } = FERRAMENTA_RESULTADO.input_schema;
+  return {
+    ...FERRAMENTA_RESULTADO,
+    input_schema: {
+      ...FERRAMENTA_RESULTADO.input_schema,
+      properties: { ...properties, fantasiaDeDupla: { type: "string" }, gatoPreto: { type: "boolean" } },
+      required: [...required, "fantasiaDeDupla", "gatoPreto"],
+    },
+  };
+}

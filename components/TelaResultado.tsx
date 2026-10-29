@@ -91,6 +91,12 @@ export default function TelaResultado({
         </p>
       )}
 
+      {resultado.halloween?.gatoPreto && (
+        <p className="selo-gato-preto" role="status">
+          🐈‍⬛ Gato preto oficial do Halloween
+        </p>
+      )}
+
       <Medidor nota={resultado.nota} />
       <h2 className="titulo-resultado">{resultado.titulo}</h2>
       <p className="veredito">{resultado.veredito}</p>
@@ -98,6 +104,12 @@ export default function TelaResultado({
         <p className="detalhe-secreto">
           <span className="detalhe-secreto-rotulo">🔍 O detalhe que ninguém notou</span>
           {resultado.detalheSecreto}
+        </p>
+      )}
+      {resultado.halloween && (
+        <p className="fantasia">
+          <span className="fantasia-rotulo">🎃 Fantasia de dupla</span>
+          {resultado.halloween.fantasia}
         </p>
       )}
       <p className="raca">

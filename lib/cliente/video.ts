@@ -5,6 +5,7 @@ import {
   carregarImagensCena,
   desenharCena,
   LARGURA_CENA,
+  textoDoSelo,
   type Animacao,
   type DadosCena,
 } from "./card";
@@ -36,9 +37,10 @@ export function formatoDeVideoSuportado(): FormatoVideo | null {
  * Linha do tempo (segundos): fotos entram → selo pula → nota conta →
  * plot twist "carimba" (se o bicho for inusitado) → título → frase e rodapé → pausa final.
  */
-export function animacaoNoTempo(t: number, inusitado: boolean): Animacao {
-  const inicioTitulo = inusitado ? 3.9 : 3.4;
-  const plotTwist = !inusitado || t < 3.4 ? 0 : 1 + 2 * (1 - suavizarSaida(trecho(t, 3.4, 3.75)));
+/** `comSelo`: a cena tem o selo inclinado no topo (plot twist ou gato preto). */
+export function animacaoNoTempo(t: number, comSelo: boolean): Animacao {
+  const inicioTitulo = comSelo ? 3.9 : 3.4;
+  const plotTwist = !comSelo || t < 3.4 ? 0 : 1 + 2 * (1 - suavizarSaida(trecho(t, 3.4, 3.75)));
   const comPulo = (inicio: number, fim: number) => {
     const p = trecho(t, inicio, fim);
     return p <= 0 ? 0 : suavizarComPulo(p);
@@ -73,7 +75,7 @@ export async function gerarVideo(
   const imagens = await carregarImagensCena(fotoPessoa, fotoBicho);
   const { canvas, ctx } = criarCanvas(LARGURA_CENA, ALTURA_CENA);
   const desenhar = (t: number) =>
-    desenharCena(ctx, dados, imagens, dominio, animacaoNoTempo(t, dados.inusitado));
+    desenharCena(ctx, dados, imagens, dominio, animacaoNoTempo(t, textoDoSelo(dados) !== null));
   desenhar(0);
 
   const stream = canvas.captureStream(QUADROS_POR_SEGUNDO);

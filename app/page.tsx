@@ -3,10 +3,15 @@ import Rodape from "@/components/Rodape";
 import { configPublica } from "@/lib/config/publico";
 import { lerConfigServidor } from "@/lib/config/servidor";
 import { dadosEstruturados, PERGUNTAS_FREQUENTES } from "@/lib/conteudo/seo";
+import { temaAtual } from "@/lib/conteudo/temporada";
+
+// Revalida a página a cada 10 min para o tema sazonal ligar e desligar sozinho na data.
+export const revalidate = 600;
 
 export default function Home() {
   // O preço vem do servidor (variável PRECO_PREMIUM_CENTAVOS) para não ficar duplicado.
   const { precoPremiumCentavos } = lerConfigServidor().pagamento;
+  const tema = temaAtual();
   return (
     <main className="pagina">
       <script
@@ -17,6 +22,9 @@ export default function Home() {
         }}
       />
       <header className="cabecalho">
+        {tema === "halloween" && (
+          <p className="faixa-tema">🎃 Edição de Halloween: a IA sugere a fantasia da dupla</p>
+        )}
         <p className="marca">Tal Dono, Tal Pet 🐾</p>
         <h1>
           O quanto você se parece com o <span className="destaque">seu pet?</span>

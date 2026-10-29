@@ -36,8 +36,60 @@ const LAYOUT = {
 
 export type DadosCena = Pick<
   ResultadoValido,
-  "nota" | "titulo" | "fraseCard" | "somDoAnimal" | "inusitado" | "especie"
+  "nota" | "titulo" | "fraseCard" | "somDoAnimal" | "inusitado" | "especie" | "halloween"
 >;
+
+/** Cores que mudam com o tema sazonal. */
+type Paleta = {
+  fundo: string;
+  bolinhas: string;
+  texto: string;
+  textoSuave: string;
+  bordaFoto: string;
+  rodapeFundo: string;
+  rodapeTexto: string;
+};
+
+const PALETA_NORMAL: Paleta = {
+  fundo: COR.fundo,
+  bolinhas: COR.bolinhas,
+  texto: COR.tinta,
+  textoSuave: COR.tintaSuave,
+  bordaFoto: COR.tinta,
+  rodapeFundo: COR.tinta,
+  rodapeTexto: COR.branco,
+};
+
+const PALETA_HALLOWEEN: Paleta = {
+  fundo: "#24123A",
+  bolinhas: "rgba(255,107,44,0.16)",
+  texto: COR.fundo,
+  textoSuave: "rgba(255,243,224,0.88)",
+  bordaFoto: COR.laranja,
+  rodapeFundo: COR.laranja,
+  rodapeTexto: COR.tinta,
+};
+
+/** Morcegos e abóboras da edição de Halloween: [x, y, escala]. */
+const DECORACAO_HALLOWEEN = {
+  morcegos: [
+    [110, 80, 1],
+    [985, 100, 0.8],
+    [150, 1300, 0.7],
+    [935, 1280, 0.9],
+  ],
+  aboboras: [
+    [105, 1110, 1],
+    [975, 1120, 0.85],
+  ],
+} as const;
+
+/** Texto do selo inclinado no topo: plot twist (bicho inusitado) ou gato preto no Halloween. */
+export function textoDoSelo(dados: DadosCena): string | null {
+  if (dados.inusitado) return `PLOT TWIST: É ${dados.especie.toLocaleUpperCase("pt-BR")}!`;
+  if (dados.halloween?.gatoPreto) return "GATO PRETO OFICIAL DO HALLOWEEN";
+  return null;
+}
 
 export type ImagensCena = { pessoa: HTMLImageElement; bicho: HTMLImageElement };
 
@@ -85,26 +137,100 @@ function comEfeito(ctx: Ctx, p: number, cx: number, cy: number, escala: number, 
   ctx.restore();
 }
 
-function desenharFundo(ctx: Ctx) {
+function desenharFundo(ctx: Ctx, paleta: Paleta) {
   const { espaco, raio } = LAYOUT.bolinhas;
-  ctx.fillStyle = COR.fundo;
+  ctx.fillStyle = paleta.fundo;
   ctx.fillRect(0, 0, LARGURA_CENA, ALTURA_CENA);
   for (let y = espaco / 2, linha = 0; y < ALTURA_CENA; y += espaco, linha++) {
     const deslocamento = linha % 2 ? espaco / 2 : espaco;
-    for (let x = deslocamento; x < LARGURA_CENA; x += espaco) circulo(ctx, x, y, raio, COR.bolinhas);
+    for (let x = deslocamento; x < LARGURA_CENA; x += espaco) circulo(ctx, x, y, raio, paleta.bolinhas);
   }
 }
 
-function desenharMarca(ctx: Ctx) {
-  ctx.fillStyle = COR.tinta;
-  ctx.font = fonte(900, LAYOUT.marca.tamanho);
-  ctx.fillText("TAL DONO, TAL PET", CENTRO_X, LAYOUT.marca.y);
+function desenharMorcego(ctx: Ctx, x: number, y: number, escala: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(escala, escala);
+  ctx.fillStyle = "#0E0716";
+  ctx.beginPath();
+  ctx.moveTo(0, -14);
+  // Asa direita com a borda de baixo recortada.
+  ctx.quadraticCurveTo(30, -40, 78, -22);
+  ctx.quadraticCurveTo(66, -6, 70, 12);
+  ctx.quadraticCurveTo(54, 2, 44, 16);
+  ctx.quadraticCurveTo(32, 4, 18, 20);
+  ctx.quadraticCurveTo(10, 12, 0, 22);
+  // Asa esquerda (espelhada).
+  ctx.quadraticCurveTo(-10, 12, -18, 20);
+  ctx.quadraticCurveTo(-32, 4, -44, 16);
+  ctx.quadraticCurveTo(-54, 2, -70, 12);
+  ctx.quadraticCurveTo(-66, -6, -78, -22);
+  ctx.quadraticCurveTo(-30, -40, 0, -14);
+  ctx.fill();
+  // Orelhas.
+  ctx.beginPath();
+  ctx.moveTo(-9, -12);
+  ctx.lineTo(-6, -30);
+  ctx.lineTo(0, -16);
+  ctx.lineTo(6, -30);
+  ctx.lineTo(9, -12);
+  ctx.fill();
+  ctx.restore();
 }
 
-function desenharFoto(ctx: Ctx, img: HTMLImageElement, cx: number) {
+function desenharAbobora(ctx: Ctx, x: number, y: number, escala: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(escala, escala);
+  ctx.fillStyle = "#3C7A2E";
+  ctx.fillRect(-6, -60, 12, 22);
+  for (const [dx, largura] of [
+    [-26, 34],
+    [26, 34],
+    [0, 36],
+  ] as const) {
+    ctx.beginPath();
+    ctx.ellipse(dx, 0, largura, 44, 0, 0, Math.PI * 2);
+    ctx.fillStyle = COR.laranja;
+    ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = COR.tinta;
+    ctx.stroke();
+  }
+  // Rosto.
+  ctx.fillStyle = COR.tinta;
+  for (const lado of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(lado * 22, -16);
+    ctx.lineTo(lado * 10, 0);
+    ctx.lineTo(lado * 34, 0);
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.moveTo(-28, 14);
+  ctx.quadraticCurveTo(0, 36, 28, 14);
+  ctx.quadraticCurveTo(0, 24, -28, 14);
+  ctx.fill();
+  ctx.restore();
+}
+
+function desenharDecoracaoHalloween(ctx: Ctx) {
+  // Lua atrás de um dos morcegos, para ele aparecer no fundo escuro.
+  circulo(ctx, 985, 95, 62, "#FFE7A3");
+  for (const [x, y, e] of DECORACAO_HALLOWEEN.morcegos) desenharMorcego(ctx, x, y, e);
+  for (const [x, y, e] of DECORACAO_HALLOWEEN.aboboras) desenharAbobora(ctx, x, y, e);
+}
+
+function desenharMarca(ctx: Ctx, paleta: Paleta, halloween: boolean) {
+  ctx.fillStyle = paleta.texto;
+  ctx.font = fonte(900, LAYOUT.marca.tamanho);
+  ctx.fillText(halloween ? "TAL DONO, TAL MONSTRO" : "TAL DONO, TAL PET", CENTRO_X, LAYOUT.marca.y);
+}
+
+function desenharFoto(ctx: Ctx, img: HTMLImageElement, cx: number, paleta: Paleta) {
   const { y: cy, raio, borda, sombra } = LAYOUT.fotos;
   circulo(ctx, cx + sombra, cy + sombra, raio + borda, COR.tinta);
-  circulo(ctx, cx, cy, raio + borda, COR.tinta);
+  circulo(ctx, cx, cy, raio + borda, paleta.bordaFoto);
   fotoEmCirculo(ctx, img, cx, cy, raio);
 }
 
@@ -123,10 +249,9 @@ function desenharEtiqueta(ctx: Ctx, texto: string, cx: number, cor: string) {
   ctx.fillText(texto, cx, cy + 2);
 }
 
-/** Selo inclinado "PLOT TWIST: É GATO!" quando o bicho não é cachorro. */
-function desenharSeloPlotTwist(ctx: Ctx, especie: string) {
+/** Selo inclinado no topo (ver textoDoSelo). */
+function desenharSeloTopo(ctx: Ctx, texto: string) {
   const p = LAYOUT.plotTwist;
-  const texto = `PLOT TWIST: É ${especie.toLocaleUpperCase("pt-BR")}!`;
   ajustarFonte(ctx, texto, { peso: 900, max: p.tamanhoMax, min: p.tamanhoMin, largura: p.larguraMax - 60 });
   const largura = ctx.measureText(texto).width + 60;
 
@@ -171,41 +296,58 @@ function desenharNota(ctx: Ctx, nota: number) {
   ctx.fillText(texto, CENTRO_X, y);
 }
 
-function desenharLegenda(ctx: Ctx) {
-  ctx.fillStyle = COR.tinta;
+function desenharLegenda(ctx: Ctx, paleta: Paleta) {
+  ctx.fillStyle = paleta.texto;
   ctx.font = fonte(800, LAYOUT.legenda.tamanho);
   ctx.fillText("PARECIDOS", CENTRO_X, LAYOUT.legenda.y);
 }
 
-/** Desenha o título e devolve o y onde a frase deve começar. */
-function desenharTitulo(ctx: Ctx, titulo: string): number {
+type LayoutTitulo = { linhas: string[]; tamanho: number; alturaLinha: number };
+
+/**
+ * Quebra o título em linhas. `compacto` (Halloween) tenta caber numa linha só, diminuindo a fonte,
+ * para sobrar espaço para a fantasia de dupla. Deixa a fonte aplicada no ctx.
+ */
+function medirTitulo(ctx: Ctx, titulo: string, compacto: boolean): LayoutTitulo {
   const t = LAYOUT.titulo;
-  ctx.fillStyle = COR.tinta;
-  ctx.font = fonte(900, t.tamanho);
+  const tamanho = compacto
+    ? ajustarFonte(ctx, titulo, { peso: 900, max: t.tamanho, min: 54, largura: t.largura })
+    : t.tamanho;
+  ctx.font = fonte(900, tamanho);
   const linhas = quebrarTexto(ctx, titulo, t.largura).slice(0, t.maxLinhas);
-  return escreverLinhas(ctx, linhas, CENTRO_X, t.y, t.alturaLinha);
+  return { linhas, tamanho, alturaLinha: Math.round((t.alturaLinha * tamanho) / t.tamanho) };
 }
 
-function alturaDoTitulo(ctx: Ctx, titulo: string): number {
-  const t = LAYOUT.titulo;
-  ctx.font = fonte(900, t.tamanho);
-  return t.y + quebrarTexto(ctx, titulo, t.largura).slice(0, t.maxLinhas).length * t.alturaLinha;
+/** Desenha o título já medido. */
+function desenharTitulo(ctx: Ctx, layout: LayoutTitulo, paleta: Paleta) {
+  ctx.fillStyle = paleta.texto;
+  ctx.font = fonte(900, layout.tamanho);
+  escreverLinhas(ctx, layout.linhas, CENTRO_X, LAYOUT.titulo.y, layout.alturaLinha);
 }
 
-function desenharFrase(ctx: Ctx, frase: string, yInicial: number) {
+/** Frase abaixo do título. Usa só as linhas que cabem antes do rodapé e põe "…" se cortar. */
+function desenharFrase(ctx: Ctx, texto: string, yInicial: number, paleta: Paleta, compacta = false) {
   const f = LAYOUT.frase;
-  ctx.fillStyle = COR.tintaSuave;
-  ctx.font = fonte(600, f.tamanho);
-  const linhas = quebrarTexto(ctx, `“${frase}”`, f.largura).slice(0, f.maxLinhas);
-  escreverLinhas(ctx, linhas, CENTRO_X, yInicial + f.espaco, f.alturaLinha);
+  const tamanho = compacta ? f.tamanho - 6 : f.tamanho;
+  const alturaLinha = compacta ? f.alturaLinha - 8 : f.alturaLinha;
+  const y = yInicial + f.espaco;
+  const cabem = Math.floor((LAYOUT.rodape.y - 24 - y) / alturaLinha);
+  const maxLinhas = Math.max(1, Math.min(compacta ? 3 : f.maxLinhas, cabem));
+  ctx.fillStyle = paleta.textoSuave;
+  ctx.font = fonte(600, tamanho);
+  const todas = quebrarTexto(ctx, texto, f.largura);
+  const linhas = todas.slice(0, maxLinhas);
+  if (todas.length > maxLinhas)
+    linhas[maxLinhas - 1] = `${linhas[maxLinhas - 1].replace(/[\s.,;:!?]+$/, "")}…`;
+  escreverLinhas(ctx, linhas, CENTRO_X, y, alturaLinha);
 }
 
-function desenharRodape(ctx: Ctx, dominio: string) {
+function desenharRodape(ctx: Ctx, dominio: string, paleta: Paleta) {
   const r = LAYOUT.rodape;
-  retanguloArredondado(ctx, r.x, r.y, r.largura, r.altura, r.altura / 2, COR.tinta);
+  retanguloArredondado(ctx, r.x, r.y, r.largura, r.altura, r.altura / 2, paleta.rodapeFundo);
   const texto = `Descubra o seu em ${dominio}`;
   ajustarFonte(ctx, texto, { peso: 800, max: r.tamanhoMax, min: r.tamanhoMin, largura: r.larguraTexto });
-  ctx.fillStyle = COR.branco;
+  ctx.fillStyle = paleta.rodapeTexto;
   ctx.fillText(texto, CENTRO_X, r.y + r.altura / 2 + 2);
 }
 
@@ -218,17 +360,20 @@ export function desenharCena(
   a: Animacao = CENA_COMPLETA,
 ) {
   const { fotos, etiquetas, nota } = LAYOUT;
-  desenharFundo(ctx);
-  comEfeito(ctx, a.marca, CENTRO_X, LAYOUT.marca.y, 1, () => desenharMarca(ctx));
+  const halloween = Boolean(dados.halloween);
+  const paleta = halloween ? PALETA_HALLOWEEN : PALETA_NORMAL;
+  desenharFundo(ctx, paleta);
+  if (halloween) desenharDecoracaoHalloween(ctx);
+  comEfeito(ctx, a.marca, CENTRO_X, LAYOUT.marca.y, 1, () => desenharMarca(ctx, paleta, halloween));
 
   // Fotos entram pelas laterais.
   if (a.fotos > 0) {
     const deslocamento = (1 - a.fotos) * 700;
     comEfeito(ctx, a.fotos, 0, 0, 1, () => {
       ctx.translate(-deslocamento, 0);
-      desenharFoto(ctx, imagens.pessoa, fotos.xPessoa);
+      desenharFoto(ctx, imagens.pessoa, fotos.xPessoa, paleta);
       ctx.translate(deslocamento * 2, 0);
-      desenharFoto(ctx, imagens.bicho, fotos.xPet);
+      desenharFoto(ctx, imagens.bicho, fotos.xPet, paleta);
     });
   }
   comEfeito(ctx, a.etiquetas, CENTRO_X, etiquetas.y, 1, () => {
@@ -241,20 +386,26 @@ export function desenharCena(
   comEfeito(ctx, Math.min(1, a.nota * 3), CENTRO_X, nota.y, 1, () =>
     desenharNota(ctx, Math.round(dados.nota * Math.min(1, a.nota))),
   );
-  comEfeito(ctx, a.legenda, CENTRO_X, LAYOUT.legenda.y, 1, () => desenharLegenda(ctx));
+  comEfeito(ctx, a.legenda, CENTRO_X, LAYOUT.legenda.y, 1, () => desenharLegenda(ctx, paleta));
 
-  const yFrase = alturaDoTitulo(ctx, dados.titulo);
+  const titulo = medirTitulo(ctx, dados.titulo, halloween);
+  const yFrase = LAYOUT.titulo.y + titulo.linhas.length * titulo.alturaLinha;
   comEfeito(ctx, Math.min(1, a.titulo), CENTRO_X, LAYOUT.titulo.y, a.titulo, () =>
-    desenharTitulo(ctx, dados.titulo),
+    desenharTitulo(ctx, titulo, paleta),
   );
-  if (dados.fraseCard)
-    comEfeito(ctx, a.frase, CENTRO_X, yFrase, 1, () => desenharFrase(ctx, dados.fraseCard, yFrase));
-  comEfeito(ctx, a.rodape, CENTRO_X, LAYOUT.rodape.y, 1, () => desenharRodape(ctx, dominio));
+  // No Halloween, a fantasia sugerida ocupa o lugar da frase.
+  const frase = dados.halloween
+    ? `Fantasia da dupla: ${dados.halloween.fantasia}`
+    : dados.fraseCard && `“${dados.fraseCard}”`;
+  if (frase)
+    comEfeito(ctx, a.frase, CENTRO_X, yFrase, 1, () => desenharFrase(ctx, frase, yFrase, paleta, halloween));
+  comEfeito(ctx, a.rodape, CENTRO_X, LAYOUT.rodape.y, 1, () => desenharRodape(ctx, dominio, paleta));
 
   // O selo "carimba" por cima de tudo, por isso vem por último.
-  if (dados.inusitado) {
+  const selo = textoDoSelo(dados);
+  if (selo) {
     comEfeito(ctx, Math.min(1, a.plotTwist), CENTRO_X, LAYOUT.plotTwist.y, a.plotTwist, () =>
-      desenharSeloPlotTwist(ctx, dados.especie),
+      desenharSeloTopo(ctx, selo),
     );
   }
 }

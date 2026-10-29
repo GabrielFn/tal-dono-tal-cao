@@ -24,7 +24,16 @@ export type ResultadoValido = {
   somDoAnimal: string;
   /** Frase engraçada quando o bicho é inusitado; vazia para cachorro e gato. */
   plotTwist: string;
+  /** Extras da edição de Halloween (só existe quando o tema estava ativo na análise). */
+  halloween?: ExtrasHalloween;
   demo?: boolean;
+};
+
+export type ExtrasHalloween = {
+  /** Fantasia de dupla sugerida pela IA a partir dos detalhes das fotos. */
+  fantasia: string;
+  /** Gato preto ganha selo especial no card. */
+  gatoPreto: boolean;
 };
 
 export type MotivoInvalido = "sem_pessoa" | "sem_animal" | "foto_ruim" | "outro";

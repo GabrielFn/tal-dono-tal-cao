@@ -1,4 +1,5 @@
-import { FERRAMENTA_RESULTADO, PROMPT_SISTEMA } from "./prompt";
+import { ferramentaParaTema, FERRAMENTA_RESULTADO, promptDoSistema } from "./prompt";
+import type { Tema } from "@/lib/conteudo/temporada";
 import { normalizarResultado } from "./normalizar";
 import { ErroAnalise, type AnalisadorDeFotos, type ImagemBase64 } from "./tipos";
 import type { Resultado } from "@/lib/tipos";
@@ -30,8 +31,8 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     this.fetch = opcoes.fetch ?? globalThis.fetch;
   }
 
-  async analisar(pessoa: ImagemBase64, pet: ImagemBase64): Promise<Resultado> {
-    const resposta = await this.chamarApi(pessoa, pet);
+  async analisar(pessoa: ImagemBase64, pet: ImagemBase64, tema: Tema | null = null): Promise<Resultado> {
+    const resposta = await this.chamarApi(pessoa, pet, tema);
 
     // O modelo pode se recusar a analisar (ex.: conteúdo impróprio). Não é falha técnica:
     // o usuário recebe uma mensagem amigável para tentar com outras fotos.
@@ -45,10 +46,10 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     if (!bloco?.input) {
       throw new ErroAnalise(`Resposta da IA sem resultado (stop_reason: ${resposta.stop_reason ?? "?"})`);
     }
-    return normalizarResultado(bloco.input);
+    return normalizarResultado(bloco.input, tema);
   }
 
-  private async chamarApi(pessoa: ImagemBase64, pet: ImagemBase64): Promise<RespostaApi> {
+  private async chamarApi(pessoa: ImagemBase64, pet: ImagemBase64, tema: Tema | null): Promise<RespostaApi> {
     let resposta: Response;
     try {
       resposta = await this.fetch(URL_API, {
@@ -58,7 +59,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
           "anthropic-version": VERSAO_API,
           "content-type": "application/json",
         },
-        body: JSON.stringify(this.montarCorpo(pessoa, pet)),
+        body: JSON.stringify(this.montarCorpo(pessoa, pet, tema)),
         signal: AbortSignal.timeout(this.opcoes.timeoutMs),
       });
     } catch (erro) {
@@ -72,7 +73,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     return resposta.json();
   }
 
-  private montarCorpo(pessoa: ImagemBase64, pet: ImagemBase64) {
+  private montarCorpo(pessoa: ImagemBase64, pet: ImagemBase64, tema: Tema | null) {
     const imagem = (img: ImagemBase64) => ({
       type: "image",
       source: { type: "base64", media_type: img.tipo, data: img.dados },
@@ -81,8 +82,8 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
     return {
       model: this.opcoes.modelo,
       max_tokens: MAX_TOKENS,
-      system: PROMPT_SISTEMA,
-      tools: [FERRAMENTA_RESULTADO],
+      system: promptDoSistema(tema),
+      tools: [ferramentaParaTema(tema)],
       tool_choice: { type: "tool", name: FERRAMENTA_RESULTADO.name },
       messages: [
         {

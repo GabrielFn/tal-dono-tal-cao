@@ -1,5 +1,6 @@
 // Camada anticorrupção: transforma a resposta "crua" da IA num Resultado confiável.
-import type { Categoria, MotivoInvalido, Resultado, ResultadoValido } from "@/lib/tipos";
+import type { Tema } from "@/lib/conteudo/temporada";
+import type { Categoria, ExtrasHalloween, MotivoInvalido, Resultado, ResultadoValido } from "@/lib/tipos";
 
 export const NOMES_CATEGORIAS = ["Olhar", "Cabelo x pelo", "Expressão", "Pose e postura", "Vibe"] as const;
 
@@ -24,6 +25,7 @@ const TAMANHO_MAXIMO = {
   comentario: 120,
   especie: 30,
   plotTwist: 180,
+  fantasia: 140,
   som: 10,
 } as const;
 
@@ -118,11 +120,21 @@ function lerCategorias(valor: unknown): Categoria[] {
   });
 }
 
+const FANTASIA_PADRAO = "Fantasia de dupla: os dois de abóbora. Combina com tudo, inclusive com vocês.";
+
+function lerHalloween(bruto: Record<string, unknown>, especie: string): ExtrasHalloween {
+  return {
+    fantasia: textoLimpo(bruto.fantasiaDeDupla, TAMANHO_MAXIMO.fantasia) || FANTASIA_PADRAO,
+    // Só gato de verdade ganha o selo, mesmo se a IA marcar outro bicho.
+    gatoPreto: especie === "gato" && bruto.gatoPreto === true,
+  };
+}
+
 function media(categorias: Categoria[]): number {
   return Math.round(categorias.reduce((soma, c) => soma + c.nota, 0) / categorias.length);
 }
 
-export function normalizarResultado(bruto: Record<string, unknown>): Resultado {
+export function normalizarResultado(bruto: Record<string, unknown>, tema: Tema | null = null): Resultado {
   if (!bruto.valido) {
     const motivo = lerMotivo(bruto.motivo);
     return {
@@ -133,6 +145,7 @@ export function normalizarResultado(bruto: Record<string, unknown>): Resultado {
   }
 
   const categorias = lerCategorias(bruto.categorias);
+  const animal = lerAnimal(bruto);
   return {
     valido: true,
     nota: bruto.nota === undefined ? media(categorias) : porcentagem(bruto.nota),
@@ -142,6 +155,7 @@ export function normalizarResultado(bruto: Record<string, unknown>): Resultado {
     fraseCard: textoLimpo(bruto.fraseCard, TAMANHO_MAXIMO.fraseCard),
     racaProvavel: textoLimpo(bruto.racaProvavel, TAMANHO_MAXIMO.raca) || "Bicho de respeito",
     categorias,
-    ...lerAnimal(bruto),
+    ...animal,
+    ...(tema === "halloween" && { halloween: lerHalloween(bruto, animal.especie) }),
   };
 }

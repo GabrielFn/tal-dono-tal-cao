@@ -1,6 +1,7 @@
 // Resultados de exemplo para o MODO DEMO (sem chave de API ou com DEMO_MODE=1).
 import type { ResultadoValido } from "@/lib/tipos";
-import type { AnalisadorDeFotos } from "./tipos";
+import type { Tema } from "@/lib/conteudo/temporada";
+import type { AnalisadorDeFotos, ImagemBase64 } from "./tipos";
 
 const CACHORRO = { inusitado: false, especie: "cachorro", somDoAnimal: "AU-AU", plotTwist: "" } as const;
 
@@ -165,6 +166,15 @@ const EXEMPLOS: Omit<ResultadoValido, "valido" | "demo">[] = [
   },
 ];
 
+/** Fantasia de Halloween de cada exemplo (mesma ordem de EXEMPLOS). */
+const FANTASIAS_HALLOWEEN = [
+  "Franja dourada e orelha dobrada: vocês já são metade de um Leão Covarde. Falta só a juba de papel.",
+  "Com essa testa franzida dos dois, fantasia de Wandinha e Coisa sai de graça.",
+  "Ele já está com a meia na boca. Vá de lençol branco e ele de fantasminha mordedor.",
+  "Queixo alto, pálpebra a meio mastro: Drácula e o gato do castelo, sem ensaio.",
+  "Topete amarelo e camiseta amarela: dupla Saci e passarinho do redemoinho.",
+];
+
 export type OpcoesDemo = {
   /** Atraso simulado, para a interface mostrar o carregamento. */
   atrasoMs?: number;
@@ -183,9 +193,21 @@ export class AnalisadorDemo implements AnalisadorDeFotos {
     this.aleatorio = opcoes.aleatorio ?? Math.random;
   }
 
-  async analisar(): Promise<ResultadoValido> {
+  async analisar(
+    _pessoa?: ImagemBase64,
+    _pet?: ImagemBase64,
+    tema: Tema | null = null,
+  ): Promise<ResultadoValido> {
     if (this.atrasoMs > 0) await new Promise((ok) => setTimeout(ok, this.atrasoMs));
     const indice = Math.floor(this.aleatorio() * EXEMPLOS.length) % EXEMPLOS.length;
-    return { valido: true, demo: true, ...EXEMPLOS[indice] };
+    const exemplo = EXEMPLOS[indice];
+    return {
+      valido: true,
+      demo: true,
+      ...exemplo,
+      ...(tema === "halloween" && {
+        halloween: { fantasia: FANTASIAS_HALLOWEEN[indice], gatoPreto: exemplo.especie === "gato" },
+      }),
+    };
   }
 }

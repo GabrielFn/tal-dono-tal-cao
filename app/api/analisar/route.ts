@@ -5,6 +5,7 @@ import { criarAnalisador } from "@/lib/analise";
 import { analisarFotos, ERROS } from "@/lib/analise/servico";
 import { obterIp } from "@/lib/analise/validacao";
 import { lerConfigServidor } from "@/lib/config/servidor";
+import { temaAtual } from "@/lib/conteudo/temporada";
 import { criarLimitador } from "@/lib/limite";
 
 export const runtime = "nodejs";
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
     analisador: criarAnalisador(config),
     limitador: criarLimitador(config),
     registrarErro: (erro) => console.error("[analisar] Falha na análise:", erro),
+    tema: temaAtual(),
   });
 
   return NextResponse.json(resposta, { status });
