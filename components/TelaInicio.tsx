@@ -5,21 +5,28 @@ import Link from "next/link";
 import SlotFoto from "./SlotFoto";
 import { mensagensDeAviso, type Estado, type TipoFoto } from "@/lib/cliente/estado";
 
+// A análise leva de 15 a 40 s: as mensagens avançam como etapas e param na última,
+// em vez de repetir em loop (repetição passa a impressão de que travou).
 const MENSAGENS_CARREGANDO = [
-  "Comparando olhares…",
-  "Medindo o nível de fofura…",
-  "Cheirando as fotos…",
-  "Consultando o júri canino…",
-  "Contando os pelos (e os fios)…",
-  "Calculando a vibe da dupla…",
+  "Abrindo as fotos…",
+  "Olhando cada detalhe do seu rosto…",
+  "Agora o do seu pet…",
+  "Comparando sobrancelhas e orelhas…",
+  "Conferindo cabelo x pelo…",
+  "Procurando o detalhe que ninguém notou…",
+  "Medindo poses e ângulos…",
+  "O júri está deliberando…",
+  "Escrevendo o veredito…",
+  "Quase lá, caprichando no resultado…",
 ];
-const TROCA_MENSAGEM_MS = 1400;
+const TROCA_MENSAGEM_MS = 4500;
 
 function useMensagemRotativa(ativa: boolean): string {
   const [indice, setIndice] = useState(0);
   useEffect(() => {
     if (!ativa) return;
-    const id = setInterval(() => setIndice((i) => (i + 1) % MENSAGENS_CARREGANDO.length), TROCA_MENSAGEM_MS);
+    const ultima = MENSAGENS_CARREGANDO.length - 1;
+    const id = setInterval(() => setIndice((i) => Math.min(i + 1, ultima)), TROCA_MENSAGEM_MS);
     return () => {
       clearInterval(id);
       setIndice(0);

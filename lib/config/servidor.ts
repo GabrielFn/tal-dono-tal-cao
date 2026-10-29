@@ -36,8 +36,9 @@ export function lerConfigServidor(env: NodeJS.ProcessEnv = process.env): ConfigS
     anthropic: {
       chave,
       modelo: texto(env.ANTHROPIC_MODEL) ?? "claude-sonnet-5-5",
-      // O Sonnet é mais lento que o Haiku; a rota tem maxDuration de 60 s.
-      timeoutMs: 55_000,
+      // O Sonnet é mais lento que o Haiku. Fica abaixo do maxDuration da rota (90 s),
+      // para dar tempo de devolver a cota e responder com erro amigável.
+      timeoutMs: 80_000,
     },
     modoDemo: env.DEMO_MODE === "1" || !chave,
     limites: {

@@ -10,7 +10,8 @@ import { criarLimitador } from "@/lib/limite";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// A IA (Sonnet) pode levar até ~40 s; folga para não cortar no meio. Ver timeoutMs em lib/config/servidor.ts.
+export const maxDuration = 90;
 
 export async function POST(req: Request) {
   let corpo: unknown;
