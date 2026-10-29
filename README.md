@@ -29,7 +29,7 @@ Abra http://localhost:3000. Sem `ANTHROPIC_API_KEY`, o app roda em **modo demo**
    | Variável                                              | Valor                                                 |
    | ----------------------------------------------------- | ----------------------------------------------------- |
    | `ANTHROPIC_API_KEY`                                   | sua chave de https://console.anthropic.com            |
-   | `ANTHROPIC_MODEL`                                     | `claude-haiku-5-5`                                    |
+   | `ANTHROPIC_MODEL`                                     | `claude-sonnet-5-5`                                   |
    | `NEXT_PUBLIC_SITE_URL`                                | o endereço final, ex.: `https://taldonotalcao.com.br` |
    | `NEXT_PUBLIC_CONTATO_EMAIL`                           | seu e-mail de contato                                 |
    | `LIMITE_DIARIO_POR_IP`                                | `5`                                                   |
