@@ -103,9 +103,12 @@ const listaDeTextos = { type: "array", items: { type: "string" } } as const;
 
 // A ordem das propriedades importa: o modelo escreve o inventário ("observacoes")
 // antes das piadas, e as piadas saem baseadas nele.
+// strict: true garante JSON no formato do schema. Regras do modo strict: todo objeto com
+// additionalProperties: false e nada de minimum/maximum (a faixa 0-100 é garantida no normalizar.ts).
 export const FERRAMENTA_RESULTADO = {
   name: "registrar_resultado",
   description: "Registra o inventário visual das fotos e o resultado da comparação.",
+  strict: true,
   input_schema: {
     type: "object",
     properties: {
@@ -124,6 +127,7 @@ export const FERRAMENTA_RESULTADO = {
           coincidencias: listaDeTextos,
         },
         required: ["pessoa", "pet", "coincidencias"],
+        additionalProperties: false,
       },
       detalheSecreto: { type: "string" },
       especie: { type: "string" },
@@ -135,13 +139,14 @@ export const FERRAMENTA_RESULTADO = {
           type: "object",
           properties: {
             nome: { type: "string" },
-            nota: { type: "integer", minimum: 0, maximum: 100 },
+            nota: { type: "integer", description: "0 a 100" },
             comentario: { type: "string" },
           },
           required: ["nome", "nota", "comentario"],
+          additionalProperties: false,
         },
       },
-      nota: { type: "integer", minimum: 0, maximum: 100 },
+      nota: { type: "integer", description: "0 a 100" },
       titulo: { type: "string" },
       veredito: { type: "string" },
       fraseCard: { type: "string" },
@@ -163,6 +168,7 @@ export const FERRAMENTA_RESULTADO = {
       "fraseCard",
       "racaProvavel",
     ],
+    additionalProperties: false,
   },
 } as const;
 

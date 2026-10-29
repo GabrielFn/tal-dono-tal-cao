@@ -20,8 +20,34 @@ export type OpcoesAnthropic = {
   fetch?: typeof fetch;
 };
 
-type BlocoConteudo = { type: string; name?: string; input?: Record<string, unknown> };
+type BlocoConteudo = { type: string; name?: string; input?: Record<string, unknown>; text?: string };
 type RespostaApi = { content?: BlocoConteudo[]; stop_reason?: string };
+
+/**
+ * Sonnet 5.5 e Opus 5.5 recusam tool_choice forçado (erro 400) e thinking "disabled".
+ * Neles a ferramenta fica em "auto" (o prompt manda chamar) e o raciocínio prévio é desligado
+ * com "between_tools": o inventário visual já faz o papel de raciocínio, e a resposta sai mais rápida.
+ */
+export function aceitaFerramentaForcada(modelo: string): boolean {
+  return !/claude-(sonnet|opus)-5-5/.test(modelo);
+}
+
+/** Último recurso: se o modelo responder em texto, tenta ler o JSON de dentro dele. */
+function jsonDoTexto(blocos: BlocoConteudo[]): Record<string, unknown> | null {
+  const texto = blocos
+    .filter((b) => b.type === "text")
+    .map((b) => b.text ?? "")
+    .join("\n");
+  const inicio = texto.indexOf("{");
+  const fim = texto.lastIndexOf("}");
+  if (inicio < 0 || fim <= inicio) return null;
+  try {
+    const valor = JSON.parse(texto.slice(inicio, fim + 1));
+    return valor && typeof valor === "object" && "valido" in valor ? valor : null;
+  } catch {
+    return null;
+  }
+}
 
 export class AnalisadorAnthropic implements AnalisadorDeFotos {
   readonly consomeCota = true;
@@ -40,13 +66,13 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
       return normalizarResultado({ valido: false, motivo: "outro" });
     }
 
-    const bloco = resposta.content?.find(
-      (c) => c.type === "tool_use" && c.name === FERRAMENTA_RESULTADO.name,
-    );
-    if (!bloco?.input) {
+    const blocos = resposta.content ?? [];
+    const bloco = blocos.find((c) => c.type === "tool_use" && c.name === FERRAMENTA_RESULTADO.name);
+    const entrada = bloco?.input ?? jsonDoTexto(blocos);
+    if (!entrada) {
       throw new ErroAnalise(`Resposta da IA sem resultado (stop_reason: ${resposta.stop_reason ?? "?"})`);
     }
-    return normalizarResultado(bloco.input, tema);
+    return normalizarResultado(entrada, tema);
   }
 
   private async chamarApi(pessoa: ImagemBase64, pet: ImagemBase64, tema: Tema | null): Promise<RespostaApi> {
@@ -84,7 +110,9 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
       max_tokens: MAX_TOKENS,
       system: promptDoSistema(tema),
       tools: [ferramentaParaTema(tema)],
-      tool_choice: { type: "tool", name: FERRAMENTA_RESULTADO.name },
+      ...(aceitaFerramentaForcada(this.opcoes.modelo)
+        ? { tool_choice: { type: "tool", name: FERRAMENTA_RESULTADO.name } }
+        : { tool_choice: { type: "auto" }, thinking: { type: "between_tools" } }),
       messages: [
         {
           role: "user",
@@ -95,7 +123,7 @@ export class AnalisadorAnthropic implements AnalisadorDeFotos {
             imagem(pet),
             {
               type: "text",
-              text: "Faça primeiro o inventário detalhado das duas fotos e só depois compare. Quero o detalhe que ninguém percebeu, nada de frase genérica.",
+              text: "Faça primeiro o inventário detalhado das duas fotos e só depois compare. Quero o detalhe que ninguém percebeu, nada de frase genérica. Responda chamando a ferramenta registrar_resultado.",
             },
           ],
         },
